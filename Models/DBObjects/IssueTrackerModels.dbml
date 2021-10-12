@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="IssueTracker" Class="IssueTrackerModelsDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=.;Initial Catalog=IssueTracker;Integrated Security=True" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="IssueTrackerConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Actions" Member="Actions">
+    <Type Name="Action">
+      <Column Name="ActionId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="IssueId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="ActionName" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
+      <Column Name="ActionDescription" Type="System.String" DbType="VarChar(1000)" CanBeNull="true" />
+      <Column Name="StartDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="EndDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="StatusId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="Issue_Action" Member="Issue" ThisKey="IssueId" OtherKey="IssueId" Type="Issue" IsForeignKey="true" />
+      <Association Name="Status_Action" Member="Status" ThisKey="StatusId" OtherKey="StatusId" Type="Status" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UserTeamRoles" Member="UserTeamRoles">
+    <Type Name="UserTeamRole">
+      <Column Name="UserTeamRoleId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="UserTeamRoleName" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
+      <Association Name="UserTeamRole_TeamGroup" Member="TeamGroups" ThisKey="UserTeamRoleId" OtherKey="UserTeamRoleId" Type="TeamGroup" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Issues" Member="Issues">
+    <Type Name="Issue">
+      <Column Name="IssueId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ProjectId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="IssueName" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
+      <Column Name="IssueDescription" Type="System.String" DbType="VarChar(1000)" CanBeNull="true" />
+      <Column Name="StartDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="EndDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="StatusId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="Issue_Action" Member="Actions" ThisKey="IssueId" OtherKey="IssueId" Type="Action" />
+      <Association Name="Project_Issue" Member="Project" ThisKey="ProjectId" OtherKey="ProjectId" Type="Project" IsForeignKey="true" />
+      <Association Name="Status_Issue" Member="Status" ThisKey="StatusId" OtherKey="StatusId" Type="Status" IsForeignKey="true" />
+      <Association Name="User_Issue" Member="User" ThisKey="UserId" OtherKey="UserId" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Projects" Member="Projects">
+    <Type Name="Project">
+      <Column Name="ProjectId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="TeamId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="ProjectName" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
+      <Column Name="ProjectDescription" Type="System.String" DbType="VarChar(1000)" CanBeNull="true" />
+      <Column Name="StartDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="EndDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="StatusId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="Project_Issue" Member="Issues" ThisKey="ProjectId" OtherKey="ProjectId" Type="Issue" />
+      <Association Name="Status_Project" Member="Status" ThisKey="StatusId" OtherKey="StatusId" Type="Status" IsForeignKey="true" />
+      <Association Name="Team_Project" Member="Team" ThisKey="TeamId" OtherKey="TeamId" Type="Team" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Status" Member="Status">
+    <Type Name="Status">
+      <Column Name="StatusId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="StatusName" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
+      <Association Name="Status_Action" Member="Actions" ThisKey="StatusId" OtherKey="StatusId" Type="Action" />
+      <Association Name="Status_Issue" Member="Issues" ThisKey="StatusId" OtherKey="StatusId" Type="Issue" />
+      <Association Name="Status_Project" Member="Projects" ThisKey="StatusId" OtherKey="StatusId" Type="Project" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TeamGroups" Member="TeamGroups">
+    <Type Name="TeamGroup">
+      <Column Name="TeamId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="UserTeamRoleId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="UserTeamRole_TeamGroup" Member="UserTeamRole" ThisKey="UserTeamRoleId" OtherKey="UserTeamRoleId" Type="UserTeamRole" IsForeignKey="true" />
+      <Association Name="Team_TeamGroup" Member="Team" ThisKey="TeamId" OtherKey="TeamId" Type="Team" IsForeignKey="true" />
+      <Association Name="User_TeamGroup" Member="User" ThisKey="UserId" OtherKey="UserId" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Teams" Member="Teams">
+    <Type Name="Team">
+      <Column Name="TeamId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="TeamName" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
+      <Column Name="TeamDescription" Type="System.String" DbType="VarChar(1000)" CanBeNull="true" />
+      <Column Name="CreatedBy" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="Team_Project" Member="Projects" ThisKey="TeamId" OtherKey="TeamId" Type="Project" />
+      <Association Name="Team_TeamGroup" Member="TeamGroups" ThisKey="TeamId" OtherKey="TeamId" Type="TeamGroup" />
+      <Association Name="User_Team" Member="User" ThisKey="CreatedBy" OtherKey="UserId" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Users" Member="Users">
+    <Type Name="User">
+      <Column Name="UserId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="UserName" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
+      <Column Name="UserEmail" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
+      <Column Name="UserDescription" Type="System.String" DbType="VarChar(1000)" CanBeNull="true" />
+      <Association Name="User_Issue" Member="Issues" ThisKey="UserId" OtherKey="UserId" Type="Issue" />
+      <Association Name="User_TeamGroup" Member="TeamGroups" ThisKey="UserId" OtherKey="UserId" Type="TeamGroup" />
+      <Association Name="User_Team" Member="Teams" ThisKey="UserId" OtherKey="CreatedBy" Type="Team" />
+    </Type>
+  </Table>
+</Database>

@@ -1,0 +1,51 @@
+﻿@model IssueTracker.Models.TeamModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>TeamModel</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TeamId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TeamId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TeamName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TeamName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TeamDescription)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TeamDescription)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreatedBy)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreatedBy)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new {id = Model.TeamId}) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

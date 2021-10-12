@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace IssueTracker.Models
+{
+    public class UserTeamRoleModel
+    {
+        public Guid userTeamRoleId { get; set; }
+        public string UserTeamRoleName { get; set; }
+
+    }
+}
