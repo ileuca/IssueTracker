@@ -1,0 +1,88 @@
+﻿using IssueTracker.Models;
+using IssueTracker.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace IssueTracker.Repository
+{
+    public class TeamViewRepository
+    {
+        private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
+        private UserRepository userRepository = new UserRepository();
+        private TeamRepository teamRepository = new TeamRepository();
+        private TeamGroupRepository teamGroupRepository = new TeamGroupRepository();
+        private UserTeamRoleRepository userTeamRoleRepository = new UserTeamRoleRepository();
+
+        public TeamViewRepository()
+        {
+            this.dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
+        }
+        public TeamViewRepository(Models.DBObjects.IssueTrackerModelsDataContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+
+
+        //Create -- CreateTeamView(CreateTeam + CreateTeamGroup)
+
+        //Read
+        //GetAllUsers(sa poata fi adaugati in Team)
+        public List<UserModel> GetAllusers()
+        {
+            List<UserModel> userList = new List<UserModel>();
+            userList = userRepository.GetAllUsers();
+            return userList;
+        }
+        //GetUsersByTeamId(sa poata fi afisati in detalii)
+        public List<UserModel> GetUsersByTeamId(Guid teamId)
+        {
+            List<UserModel> userList = new List<UserModel>();
+            List<TeamGroupsModel> teamGroupModelList = new List<TeamGroupsModel>();
+            List<UserModel> userListByTeam = new List<UserModel>();
+            teamGroupModelList = teamGroupRepository.GetAllTeamGroups();
+            userList = userRepository.GetAllUsers();
+
+            foreach (TeamGroupsModel teamGroupModel in teamGroupModelList)
+            {
+                foreach (UserModel userModel in userList)
+                {
+                    if (userModel.UserId == teamGroupModel.UserId && teamId == teamGroupModel.UserId)
+                    {
+                        userListByTeam.Add(userModel);
+                    }
+                }
+            }
+            return userListByTeam;
+        }
+        //GetTeamNameByID
+        public void GetTeamNameById(Guid teamId)
+        {
+            TeamViewModel teamViewModel = new TeamViewModel();
+            teamViewModel.TeamName = teamRepository.GetTeamById(teamId).TeamName;
+        }
+        //GetTeamRoles
+        public List<UserTeamRoleModel> GetAllTeamRoles()
+        {
+            List<UserTeamRoleModel> userTeamRoleModels = new List<UserTeamRoleModel>();
+            userTeamRoleModels = userTeamRoleRepository.GetTeamRoleModels();
+            return userTeamRoleModels;
+        }
+        //GetAllTEamGroups
+        public List<TeamGroupsModel> GetAllTeamGroups()
+        {
+            List<TeamGroupsModel> teamGroupsModels = new List<TeamGroupsModel>();
+            teamGroupsModels = teamGroupRepository.GetAllTeamGroups();
+            return teamGroupsModels;
+
+        }
+        //GetAllTeamViewModels?
+        //bazeazate pe usersbyteamid si fa un roles by userid si rolesbyteamid
+
+        //Update -- UpdateByUserID(Roluri) // UpdateByTeamID(Users)+Roluri?
+
+        //Delete -- DeleteByUserID user din team Group // DeleteByTeamId (absolut Toate inregistrarile)
+    }
+
+}

@@ -211,6 +211,7 @@
     <Compile Include="Repository\StatusRepository.cs" />
     <Compile Include="Repository\TeamGroupRepository.cs" />
     <Compile Include="Repository\TeamRepository.cs" />
+    <Compile Include="Repository\TeamViewRepository.cs" />
     <Compile Include="Repository\UserRepository.cs" />
     <Compile Include="Repository\UserTeamRoleRepository.cs" />
     <Compile Include="Startup.cs" />
