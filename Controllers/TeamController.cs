@@ -1,4 +1,5 @@
 ﻿using IssueTracker.Models;
+using IssueTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -9,6 +10,7 @@ namespace IssueTracker.Controllers
     public class TeamController : Controller
     {
         private Repository.TeamRepository TeamRepository = new Repository.TeamRepository();
+        private Repository.TeamViewRepository TeamViewRepository = new Repository.TeamViewRepository();
         // GET: Team
         public ActionResult Index()
         {
@@ -20,8 +22,8 @@ namespace IssueTracker.Controllers
         // GET: Team/Details/5
         public ActionResult Details(Guid id)
         {
-            TeamModel teamModel = TeamRepository.GetTeamById(id);
-            return View("Details", teamModel);
+            List<TeamViewModel> teamViewModels = TeamViewRepository.GetTEamViewModelsByTeamId(id);
+            return View("Details", teamViewModels);
         }
 
         // GET: Team/Create

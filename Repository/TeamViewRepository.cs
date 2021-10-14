@@ -24,6 +24,20 @@ namespace IssueTracker.Repository
             this.dbContext = dbContext;
         }
 
+        public TeamViewModel MapModelsToTeamViewModel(TeamGroupsModel teamGroupsModel)
+        {
+            TeamViewModel teamViewModel = new TeamViewModel();
+            teamViewModel.TeamId = teamGroupsModel.TeamId;
+            teamViewModel.TeamName = teamRepository.GetTeamById(teamGroupsModel.TeamId).TeamName;
+            teamViewModel.TeamDescription = teamRepository.GetTeamById(teamGroupsModel.TeamId).TeamDescription;
+            teamViewModel.UserId = teamGroupsModel.UserId;
+            teamViewModel.UserNameSurname = userRepository.GetUserById(teamGroupsModel.UserId).UserName;
+            teamViewModel.TeamRoleId = teamGroupsModel.UserTeamRoleId;
+            teamViewModel.TeamRoleName = userTeamRoleRepository.GetTeamRoleModels().FirstOrDefault(x=>x.userTeamRoleId == teamGroupsModel.UserTeamRoleId).UserTeamRoleName;
+
+            return teamViewModel;
+
+        }
 
         //Create -- CreateTeamView(CreateTeam + CreateTeamGroup)
 
@@ -61,6 +75,28 @@ namespace IssueTracker.Repository
         {
             TeamViewModel teamViewModel = new TeamViewModel();
             teamViewModel.TeamName = teamRepository.GetTeamById(teamId).TeamName;
+        }
+        //getAllTEamViewModels
+        public List<TeamViewModel> GetAllTeamViewModels()
+        {
+            List<TeamViewModel> teamViewModels = new List<TeamViewModel>();
+            foreach(TeamGroupsModel teamGroupsModel in GetAllTeamGroups())
+            {
+                teamViewModels.Add(MapModelsToTeamViewModel(teamGroupsModel));
+            }
+            return teamViewModels;
+        }
+        public List<TeamViewModel> GetTEamViewModelsByTeamId(Guid id)
+        {
+            List<TeamViewModel> teamViewModels = new List<TeamViewModel>();
+            foreach(TeamViewModel teamViewModel in GetAllTeamViewModels())
+            {
+                if (teamViewModel.TeamId == id)
+                {
+                    teamViewModels.Add(teamViewModel);
+                }
+            }
+            return teamViewModels;
         }
         //GetTeamRoles
         public List<UserTeamRoleModel> GetAllTeamRoles()

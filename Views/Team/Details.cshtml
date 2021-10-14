@@ -1,5 +1,4 @@
-﻿@model IssueTracker.ViewModels.TeamViewModel
-
+﻿@model IEnumerable<IssueTracker.ViewModels.TeamViewModel>
 @{
     ViewBag.Title = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,44 +7,38 @@
 <h2>Details</h2>
 
 <div>
-    <h4>TeamModel</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.TeamId)
-        </dt>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TeamName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserNameSurname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TeamRoleName)
+            </th>
+        </tr>
 
-        <dd>
-            @Html.DisplayFor(model => model.TeamId)
-        </dd>
+        @foreach (var item in Model)
+        {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.TeamName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UserNameSurname)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TeamRoleName)
+        </td>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.TeamName)
-        </dt>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.TeamId }) |
+            @Html.ActionLink("Details", "Details", new { id = item.TeamId }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.TeamId })
+        </td>
+    </tr>}
 
-        <dd>
-            @Html.DisplayFor(model => model.TeamName)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.TeamDescription)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.TeamDescription)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedBy)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.CreatedBy)
-        </dd>
-
-    </dl>
+    </table>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new {id = Model.TeamId}) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
