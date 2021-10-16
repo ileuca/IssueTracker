@@ -25,10 +25,6 @@ namespace IssueTracker.Repository
             this.dbContext = dbContext;
         }
 
-    
-
-
-
         public TeamViewModel MapModelsToTeamViewModel(TeamGroupsModel teamGroupsModel)
         {
             TeamViewModel teamViewModel = new TeamViewModel();

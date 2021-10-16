@@ -1,5 +1,6 @@
 ﻿using IssueTracker.Models;
 using IssueTracker.Models.DBObjects;
+using IssueTracker.Repository;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +19,18 @@ namespace IssueTracker.ViewModels
         public string UserNameSurname { get; set; }
         public Guid TeamRoleId { get; set; }
         public string TeamRoleName { get; set; }
+        public List<UserModel> userList { get; set; }
+        public List<UserTeamRoleModel> userTeamRoleModelList { get; set; }
+        public IDictionary<UserModel, UserTeamRoleModel> SelectedUsers { get; set; }
+        public TeamViewModel()
+        {
+
+            UserRepository userRepository = new UserRepository();
+            UserTeamRoleRepository userTeamRoleRepository = new UserTeamRoleRepository();
+
+            userList = userRepository.GetAllUsers();
+            userTeamRoleModelList = userTeamRoleRepository.GetTeamRoleModels();
+        }
 
     }
 

@@ -2,38 +2,50 @@
 
 @{
     ViewBag.Title = "AddUser";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>AddUser</h2>
 
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        <h4>TeamViewModel</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.UserId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.UserId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.UserId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(model => model.TeamRoleId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.TeamRoleId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.TeamRoleId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </div>
+        @Html.ActionLink("Add Users Team", "AddUsersToTeam", null, new { @class = "btn btn-success" })
+
+        <table style="width:100%">
+            <colgroup>
+                <col style="width: 30%;">
+                <col style="width: 70%;">
+            </colgroup>
+            <tbody>
+                @foreach (var item in Model.userList)
+                {
+                    <tr>
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="@item.UserId" id="@item.UserId" name="userCheck">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    @item.UserName
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <select class="right form-select" aria-label="Default select example">
+                                <option selected>Team Role *</option>
+                                @foreach (var teamRole in Model.userTeamRoleModelList)
+                                {
+                                    <option value="@teamRole.userTeamRoleId">@teamRole.UserTeamRoleName</option>
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
     </div>
 }
 
