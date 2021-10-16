@@ -32,6 +32,8 @@ namespace IssueTracker.Repository
             }
             return null;
         }
+
+
         private User MapModelToDbObject(UserModel userModel)
         {
             User dbUser = new User();

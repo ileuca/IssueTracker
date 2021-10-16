@@ -1,4 +1,5 @@
 ﻿using IssueTracker.Models;
+using IssueTracker.Models.DBObjects;
 using IssueTracker.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,10 @@ namespace IssueTracker.Repository
             this.dbContext = dbContext;
         }
 
+    
+
+
+
         public TeamViewModel MapModelsToTeamViewModel(TeamGroupsModel teamGroupsModel)
         {
             TeamViewModel teamViewModel = new TeamViewModel();
@@ -38,8 +43,22 @@ namespace IssueTracker.Repository
             return teamViewModel;
 
         }
+        public TeamGroup MapTeamViewModelToTeamGroup(TeamViewModel teamViewModel)
+        {
+            TeamGroup teamGroup = new TeamGroup();
+            teamGroup.TeamId = teamViewModel.TeamId;
+            teamGroup.UserId = teamViewModel.UserId;
+            teamGroup.UserTeamRoleId = teamViewModel.TeamRoleId;
+
+            return teamGroup;
+        }
 
         //Create -- CreateTeamView(CreateTeam + CreateTeamGroup)
+        public void CreateTeamGroup(TeamViewModel teamViewModel)
+        {  
+            dbContext.TeamGroups.InsertOnSubmit(MapTeamViewModelToTeamGroup(teamViewModel));
+            dbContext.SubmitChanges();
+        }
 
         //Read
         //GetAllUsers(sa poata fi adaugati in Team)

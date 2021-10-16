@@ -7,38 +7,50 @@
 <h2>Details</h2>
 
 <div>
+    <div class="form-group">
+        <h2 class="align-middle">
+            @{ string value = Model.FirstOrDefault().TeamName;}
+            @value
+        </h2>
+        @Html.ActionLink("Add New User", "AddUser", "Team", new { @id = Model.FirstOrDefault().TeamId }, new {@class="btn btn-success"})
+    </div>
     <table class="table">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.TeamName)
-            </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.UserNameSurname)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.TeamRoleName)
             </th>
+            <th>Operations</th>
         </tr>
 
         @foreach (var item in Model)
         {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.TeamName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UserNameSurname)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TeamRoleName)
-        </td>
+            if (item.UserNameSurname == "")
+            {
 
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id = item.TeamId }) |
-            @Html.ActionLink("Details", "Details", new { id = item.TeamId }) |
-            @Html.ActionLink("Delete", "Delete", new { id = item.TeamId })
-        </td>
-    </tr>}
+            }
+            else
+            {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserNameSurname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TeamRoleName)
+                </td>
+
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.TeamId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.TeamId })
+                </td>
+            </tr>
+            }
+
+        }
 
     </table>
 </div>

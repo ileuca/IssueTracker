@@ -19,10 +19,54 @@ namespace IssueTracker.Controllers
             return View("Index", userTeamRoleModels);
         }
 
+
+
+
+        public ActionResult AddUser(Guid id)
+        {
+            TeamViewModel teamViewModel = new TeamViewModel();
+            if (TeamViewRepository.GetTEamViewModelsByTeamId(id).Find(x => x.TeamId == id) != null)
+            {
+                teamViewModel.TeamId = TeamViewRepository.GetTEamViewModelsByTeamId(id).Find(x => x.TeamId == id).TeamId;
+                return View("AddUser", teamViewModel);
+            }
+            else
+            {
+                teamViewModel.TeamId = id;
+                return View("AddUser", teamViewModel);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult AddUser(FormCollection collection)
+        {
+            dynamic teamViewModels = new ExpandoObject();
+            try
+            {
+                TeamViewModel teamViewModel = new TeamViewModel();
+                UpdateModel(teamViewModel);
+                TeamViewRepository.CreateTeamGroup(teamViewModel);
+                return RedirectToAction("Details");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+        
         // GET: Team/Details/5
         public ActionResult Details(Guid id)
         {
             List<TeamViewModel> teamViewModels = TeamViewRepository.GetTEamViewModelsByTeamId(id);
+            if (TeamViewRepository.GetTEamViewModelsByTeamId(id).Count == 0)
+            {
+                TeamViewModel teamViewModel = new TeamViewModel();
+                teamViewModel.TeamId = id;
+                teamViewModel.UserNameSurname = "";
+                teamViewModels.Add(teamViewModel);
+                return View("Details", teamViewModels);
+            }
+            
             return View("Details", teamViewModels);
         }
 
@@ -31,6 +75,9 @@ namespace IssueTracker.Controllers
         {
             return View();
         }
+
+
+
 
         // POST: Team/Create
         [HttpPost]
