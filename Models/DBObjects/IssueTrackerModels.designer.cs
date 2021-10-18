@@ -51,6 +51,9 @@ namespace IssueTracker.Models.DBObjects
     partial void InsertUser(User instance);
     partial void UpdateUser(User instance);
     partial void DeleteUser(User instance);
+    partial void InsertTeamGroup(TeamGroup instance);
+    partial void UpdateTeamGroup(TeamGroup instance);
+    partial void DeleteTeamGroup(TeamGroup instance);
     #endregion
 		
 		public IssueTrackerModelsDataContext() : 
@@ -123,14 +126,6 @@ namespace IssueTracker.Models.DBObjects
 			}
 		}
 		
-		public System.Data.Linq.Table<TeamGroup> TeamGroups
-		{
-			get
-			{
-				return this.GetTable<TeamGroup>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Team> Teams
 		{
 			get
@@ -144,6 +139,14 @@ namespace IssueTracker.Models.DBObjects
 			get
 			{
 				return this.GetTable<User>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TeamGroup> TeamGroups
+		{
+			get
+			{
+				return this.GetTable<TeamGroup>();
 			}
 		}
 	}
@@ -446,6 +449,8 @@ namespace IssueTracker.Models.DBObjects
 		
 		private string _UserTeamRoleName;
 		
+		private EntitySet<TeamGroup> _TeamGroups;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -458,6 +463,7 @@ namespace IssueTracker.Models.DBObjects
 		
 		public UserTeamRole()
 		{
+			this._TeamGroups = new EntitySet<TeamGroup>(new Action<TeamGroup>(this.attach_TeamGroups), new Action<TeamGroup>(this.detach_TeamGroups));
 			OnCreated();
 		}
 		
@@ -501,6 +507,19 @@ namespace IssueTracker.Models.DBObjects
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="UserTeamRole_TeamGroup", Storage="_TeamGroups", ThisKey="UserTeamRoleId", OtherKey="UserTeamRoleId")]
+		public EntitySet<TeamGroup> TeamGroups
+		{
+			get
+			{
+				return this._TeamGroups;
+			}
+			set
+			{
+				this._TeamGroups.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -519,6 +538,18 @@ namespace IssueTracker.Models.DBObjects
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+		
+		private void attach_TeamGroups(TeamGroup entity)
+		{
+			this.SendPropertyChanging();
+			entity.UserTeamRole = this;
+		}
+		
+		private void detach_TeamGroups(TeamGroup entity)
+		{
+			this.SendPropertyChanging();
+			entity.UserTeamRole = null;
 		}
 	}
 	
@@ -1389,69 +1420,6 @@ namespace IssueTracker.Models.DBObjects
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TeamGroups")]
-	public partial class TeamGroup
-	{
-		
-		private System.Guid _TeamId;
-		
-		private System.Guid _UserId;
-		
-		private System.Guid _UserTeamRoleId;
-		
-		public TeamGroup()
-		{
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TeamId", DbType="UniqueIdentifier NOT NULL")]
-		public System.Guid TeamId
-		{
-			get
-			{
-				return this._TeamId;
-			}
-			set
-			{
-				if ((this._TeamId != value))
-				{
-					this._TeamId = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserId", DbType="UniqueIdentifier NOT NULL")]
-		public System.Guid UserId
-		{
-			get
-			{
-				return this._UserId;
-			}
-			set
-			{
-				if ((this._UserId != value))
-				{
-					this._UserId = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserTeamRoleId", DbType="UniqueIdentifier NOT NULL")]
-		public System.Guid UserTeamRoleId
-		{
-			get
-			{
-				return this._UserTeamRoleId;
-			}
-			set
-			{
-				if ((this._UserTeamRoleId != value))
-				{
-					this._UserTeamRoleId = value;
-				}
-			}
-		}
-	}
-	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Teams")]
 	public partial class Team : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1467,6 +1435,8 @@ namespace IssueTracker.Models.DBObjects
 		private System.Guid _CreatedBy;
 		
 		private EntitySet<Project> _Projects;
+		
+		private EntitySet<TeamGroup> _TeamGroups;
 		
 		private EntityRef<User> _User;
 		
@@ -1487,6 +1457,7 @@ namespace IssueTracker.Models.DBObjects
 		public Team()
 		{
 			this._Projects = new EntitySet<Project>(new Action<Project>(this.attach_Projects), new Action<Project>(this.detach_Projects));
+			this._TeamGroups = new EntitySet<TeamGroup>(new Action<TeamGroup>(this.attach_TeamGroups), new Action<TeamGroup>(this.detach_TeamGroups));
 			this._User = default(EntityRef<User>);
 			OnCreated();
 		}
@@ -1588,6 +1559,19 @@ namespace IssueTracker.Models.DBObjects
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Team_TeamGroup", Storage="_TeamGroups", ThisKey="TeamId", OtherKey="TeamId")]
+		public EntitySet<TeamGroup> TeamGroups
+		{
+			get
+			{
+				return this._TeamGroups;
+			}
+			set
+			{
+				this._TeamGroups.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Team", Storage="_User", ThisKey="CreatedBy", OtherKey="UserId", IsForeignKey=true)]
 		public User User
 		{
@@ -1653,6 +1637,18 @@ namespace IssueTracker.Models.DBObjects
 			this.SendPropertyChanging();
 			entity.Team = null;
 		}
+		
+		private void attach_TeamGroups(TeamGroup entity)
+		{
+			this.SendPropertyChanging();
+			entity.Team = this;
+		}
+		
+		private void detach_TeamGroups(TeamGroup entity)
+		{
+			this.SendPropertyChanging();
+			entity.Team = null;
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Users")]
@@ -1673,6 +1669,8 @@ namespace IssueTracker.Models.DBObjects
 		
 		private EntitySet<Team> _Teams;
 		
+		private EntitySet<TeamGroup> _TeamGroups;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -1691,6 +1689,7 @@ namespace IssueTracker.Models.DBObjects
 		{
 			this._Issues = new EntitySet<Issue>(new Action<Issue>(this.attach_Issues), new Action<Issue>(this.detach_Issues));
 			this._Teams = new EntitySet<Team>(new Action<Team>(this.attach_Teams), new Action<Team>(this.detach_Teams));
+			this._TeamGroups = new EntitySet<TeamGroup>(new Action<TeamGroup>(this.attach_TeamGroups), new Action<TeamGroup>(this.detach_TeamGroups));
 			OnCreated();
 		}
 		
@@ -1800,6 +1799,19 @@ namespace IssueTracker.Models.DBObjects
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_TeamGroup", Storage="_TeamGroups", ThisKey="UserId", OtherKey="UserId")]
+		public EntitySet<TeamGroup> TeamGroups
+		{
+			get
+			{
+				return this._TeamGroups;
+			}
+			set
+			{
+				this._TeamGroups.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1842,6 +1854,275 @@ namespace IssueTracker.Models.DBObjects
 		{
 			this.SendPropertyChanging();
 			entity.User = null;
+		}
+		
+		private void attach_TeamGroups(TeamGroup entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_TeamGroups(TeamGroup entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TeamGroups")]
+	public partial class TeamGroup : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private System.Guid _TeamId;
+		
+		private System.Guid _UserId;
+		
+		private System.Guid _UserTeamRoleId;
+		
+		private int _TeamGroupID;
+		
+		private EntityRef<Team> _Team;
+		
+		private EntityRef<User> _User;
+		
+		private EntityRef<UserTeamRole> _UserTeamRole;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnTeamIdChanging(System.Guid value);
+    partial void OnTeamIdChanged();
+    partial void OnUserIdChanging(System.Guid value);
+    partial void OnUserIdChanged();
+    partial void OnUserTeamRoleIdChanging(System.Guid value);
+    partial void OnUserTeamRoleIdChanged();
+    partial void OnTeamGroupIDChanging(int value);
+    partial void OnTeamGroupIDChanged();
+    #endregion
+		
+		public TeamGroup()
+		{
+			this._Team = default(EntityRef<Team>);
+			this._User = default(EntityRef<User>);
+			this._UserTeamRole = default(EntityRef<UserTeamRole>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TeamId", DbType="UniqueIdentifier NOT NULL")]
+		public System.Guid TeamId
+		{
+			get
+			{
+				return this._TeamId;
+			}
+			set
+			{
+				if ((this._TeamId != value))
+				{
+					if (this._Team.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnTeamIdChanging(value);
+					this.SendPropertyChanging();
+					this._TeamId = value;
+					this.SendPropertyChanged("TeamId");
+					this.OnTeamIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserId", DbType="UniqueIdentifier NOT NULL")]
+		public System.Guid UserId
+		{
+			get
+			{
+				return this._UserId;
+			}
+			set
+			{
+				if ((this._UserId != value))
+				{
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUserIdChanging(value);
+					this.SendPropertyChanging();
+					this._UserId = value;
+					this.SendPropertyChanged("UserId");
+					this.OnUserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserTeamRoleId", DbType="UniqueIdentifier NOT NULL")]
+		public System.Guid UserTeamRoleId
+		{
+			get
+			{
+				return this._UserTeamRoleId;
+			}
+			set
+			{
+				if ((this._UserTeamRoleId != value))
+				{
+					if (this._UserTeamRole.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUserTeamRoleIdChanging(value);
+					this.SendPropertyChanging();
+					this._UserTeamRoleId = value;
+					this.SendPropertyChanged("UserTeamRoleId");
+					this.OnUserTeamRoleIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TeamGroupID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int TeamGroupID
+		{
+			get
+			{
+				return this._TeamGroupID;
+			}
+			set
+			{
+				if ((this._TeamGroupID != value))
+				{
+					this.OnTeamGroupIDChanging(value);
+					this.SendPropertyChanging();
+					this._TeamGroupID = value;
+					this.SendPropertyChanged("TeamGroupID");
+					this.OnTeamGroupIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Team_TeamGroup", Storage="_Team", ThisKey="TeamId", OtherKey="TeamId", IsForeignKey=true)]
+		public Team Team
+		{
+			get
+			{
+				return this._Team.Entity;
+			}
+			set
+			{
+				Team previousValue = this._Team.Entity;
+				if (((previousValue != value) 
+							|| (this._Team.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Team.Entity = null;
+						previousValue.TeamGroups.Remove(this);
+					}
+					this._Team.Entity = value;
+					if ((value != null))
+					{
+						value.TeamGroups.Add(this);
+						this._TeamId = value.TeamId;
+					}
+					else
+					{
+						this._TeamId = default(System.Guid);
+					}
+					this.SendPropertyChanged("Team");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_TeamGroup", Storage="_User", ThisKey="UserId", OtherKey="UserId", IsForeignKey=true)]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.TeamGroups.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.TeamGroups.Add(this);
+						this._UserId = value.UserId;
+					}
+					else
+					{
+						this._UserId = default(System.Guid);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="UserTeamRole_TeamGroup", Storage="_UserTeamRole", ThisKey="UserTeamRoleId", OtherKey="UserTeamRoleId", IsForeignKey=true)]
+		public UserTeamRole UserTeamRole
+		{
+			get
+			{
+				return this._UserTeamRole.Entity;
+			}
+			set
+			{
+				UserTeamRole previousValue = this._UserTeamRole.Entity;
+				if (((previousValue != value) 
+							|| (this._UserTeamRole.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._UserTeamRole.Entity = null;
+						previousValue.TeamGroups.Remove(this);
+					}
+					this._UserTeamRole.Entity = value;
+					if ((value != null))
+					{
+						value.TeamGroups.Add(this);
+						this._UserTeamRoleId = value.UserTeamRoleId;
+					}
+					else
+					{
+						this._UserTeamRoleId = default(System.Guid);
+					}
+					this.SendPropertyChanged("UserTeamRole");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 }

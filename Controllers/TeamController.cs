@@ -11,6 +11,9 @@ namespace IssueTracker.Controllers
     {
         private Repository.TeamRepository TeamRepository = new Repository.TeamRepository();
         private Repository.TeamViewRepository TeamViewRepository = new Repository.TeamViewRepository();
+        private Repository.UserRepository UserRepository = new Repository.UserRepository();
+        private Repository.UserTeamRoleRepository UserTeamRoleRepository = new Repository.UserTeamRoleRepository();
+
         // GET: Team
         public ActionResult Index()
         {
@@ -40,18 +43,21 @@ namespace IssueTracker.Controllers
         [HttpPost]
         public ActionResult AddUser(FormCollection collection)
         {
-            dynamic teamViewModels = new ExpandoObject();
+            dynamic teamGroups = new ExpandoObject();
             try
-            {
+            {      //check if users exists in team and change only ream role if necesarry
+
                 TeamViewModel teamViewModel = new TeamViewModel();
                 UpdateModel(teamViewModel);
                 TeamViewRepository.CreateTeamGroup(teamViewModel);
-                return RedirectToAction("Details");
+                return RedirectToAction("Details",new { id = teamViewModel.TeamId });
             }
             catch
             {
                 return View();
             }
+
+
         }
         
         // GET: Team/Details/5

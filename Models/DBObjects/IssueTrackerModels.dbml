@@ -59,16 +59,6 @@
       <Association Name="Status_Project" Member="Projects" ThisKey="StatusId" OtherKey="StatusId" Type="Project" />
     </Type>
   </Table>
-  <Table Name="dbo.TeamGroups" Member="TeamGroups">
-    <Type Name="TeamGroup">
-      <Column Name="TeamId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
-      <Column Name="UserId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
-      <Column Name="UserTeamRoleId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
-      <Association Name="UserTeamRole_TeamGroup" Member="UserTeamRole" ThisKey="UserTeamRoleId" OtherKey="UserTeamRoleId" Type="UserTeamRole" IsForeignKey="true" />
-      <Association Name="Team_TeamGroup" Member="Team" ThisKey="TeamId" OtherKey="TeamId" Type="Team" IsForeignKey="true" />
-      <Association Name="User_TeamGroup" Member="User" ThisKey="UserId" OtherKey="UserId" Type="User" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Teams" Member="Teams">
     <Type Name="Team">
       <Column Name="TeamId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -87,8 +77,19 @@
       <Column Name="UserEmail" Type="System.String" DbType="VarChar(1000) NOT NULL" CanBeNull="false" />
       <Column Name="UserDescription" Type="System.String" DbType="VarChar(1000)" CanBeNull="true" />
       <Association Name="User_Issue" Member="Issues" ThisKey="UserId" OtherKey="UserId" Type="Issue" />
-      <Association Name="User_TeamGroup" Member="TeamGroups" ThisKey="UserId" OtherKey="UserId" Type="TeamGroup" />
       <Association Name="User_Team" Member="Teams" ThisKey="UserId" OtherKey="CreatedBy" Type="Team" />
+      <Association Name="User_TeamGroup" Member="TeamGroups" ThisKey="UserId" OtherKey="UserId" Type="TeamGroup" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TeamGroups" Member="TeamGroups">
+    <Type Name="TeamGroup">
+      <Column Name="TeamId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="UserTeamRoleId" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="TeamGroupID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Association Name="Team_TeamGroup" Member="Team" ThisKey="TeamId" OtherKey="TeamId" Type="Team" IsForeignKey="true" />
+      <Association Name="User_TeamGroup" Member="User" ThisKey="UserId" OtherKey="UserId" Type="User" IsForeignKey="true" />
+      <Association Name="UserTeamRole_TeamGroup" Member="UserTeamRole" ThisKey="UserTeamRoleId" OtherKey="UserTeamRoleId" Type="UserTeamRole" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

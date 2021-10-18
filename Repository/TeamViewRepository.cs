@@ -42,6 +42,7 @@ namespace IssueTracker.Repository
         public TeamGroup MapTeamViewModelToTeamGroup(TeamViewModel teamViewModel)
         {
             TeamGroup teamGroup = new TeamGroup();
+            //teamGroup.TeamGroupId = teamGroupRepository.GetAllTeamGroups().Count + 1;
             teamGroup.TeamId = teamViewModel.TeamId;
             teamGroup.UserId = teamViewModel.UserId;
             teamGroup.UserTeamRoleId = teamViewModel.TeamRoleId;
@@ -86,10 +87,11 @@ namespace IssueTracker.Repository
             return userListByTeam;
         }
         //GetTeamNameByID
-        public void GetTeamNameById(Guid teamId)
+        public string GetTeamNameById(Guid teamId)
         {
             TeamViewModel teamViewModel = new TeamViewModel();
             teamViewModel.TeamName = teamRepository.GetTeamById(teamId).TeamName;
+            return teamViewModel.TeamName;
         }
         //getAllTEamViewModels
         public List<TeamViewModel> GetAllTeamViewModels()
