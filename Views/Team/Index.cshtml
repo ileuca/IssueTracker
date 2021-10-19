@@ -30,7 +30,7 @@
             @Html.DisplayFor(modelItem => item.TeamDescription)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new {id=item.TeamId}) |
+            @Html.ActionLink("Edit", "EditTeam", new {TeamId=item.TeamId}) |
             @Html.ActionLink("Details", "Details", new { id = item.TeamId }) |
             @Html.ActionLink("Delete", "DeleteTeam", new { TeamId = item.TeamId })
         </td>

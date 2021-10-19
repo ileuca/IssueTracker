@@ -9,11 +9,6 @@ namespace IssueTracker.Models
         public string TeamName { get; set; }
         public string TeamDescription { get; set; }
         public Guid CreatedBy { get; set; }
-        public TeamModel()
-        {
-            TeamViewModel teamViewModel = new TeamViewModel();
-            teamViewModel.TeamId = TeamId;
-            teamViewModel.TeamName = TeamName;
-        }
+
     }
 }

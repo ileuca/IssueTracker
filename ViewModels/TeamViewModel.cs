@@ -16,12 +16,11 @@ namespace IssueTracker.ViewModels
         public string TeamDescription { get; set; }
         public Guid UserId { get; set; }
         public string UserNameSurname { get; set; }
+        public string UserDescription { get; set; }
         public Guid TeamRoleId { get; set; }
         public string TeamRoleName { get; set; }
         public List<UserModel> userList { get; set; }
         public List<UserTeamRoleModel> userTeamRoleModelList { get; set; }
-        public Guid selectedUser { get; set; }
-        public Guid selectedRole { get; set; }
 
         public TeamViewModel()
         {

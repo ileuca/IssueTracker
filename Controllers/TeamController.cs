@@ -18,13 +18,33 @@ namespace IssueTracker.Controllers
         // GET: Team
         public ActionResult Index()
         {
-            List<TeamModel> userTeamRoleModels = new List<TeamModel>();
-            userTeamRoleModels = TeamRepository.GetTeamsCreatedBy();
-            return View("Index", userTeamRoleModels);
+            try
+            {
+                List<TeamModel> userTeamRoleModels = new List<TeamModel>();
+                userTeamRoleModels = TeamRepository.GetTeamsCreatedBy();
+                return View("Index", userTeamRoleModels);
+            }
+            catch
+            {
+                return View("Index","Home");
+            }
         }
 
-
-
+        public ActionResult EditTeamMember(Guid TeamId, Guid UserId)
+        {
+            TeamViewModel teamViewModel = new TeamViewModel();
+            teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
+            return View("EditTeamMember",teamViewModel);
+        }
+        [HttpPost]
+        public ActionResult EditTeamMember(Guid TeamId, Guid UserId, FormCollection formCollection)
+        {
+            TeamViewModel teamViewModel = new TeamViewModel();
+            teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
+            UpdateModel(teamViewModel);
+            TeamViewRepository.UpdateTeamGroup(teamViewModel);
+            return RedirectToAction("Details", new { id=teamViewModel.TeamId});
+        }
 
         public ActionResult AddUser(Guid id)
         {
@@ -105,19 +125,22 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Team/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult EditTeam(Guid TeamId)
         {
-            return View();
+            TeamModel teamModel = new TeamModel();
+            teamModel = TeamRepository.GetTeamById(TeamId);
+            return View("Edit",teamModel);
         }
 
         // POST: Team/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult EditTeam(Guid TeamId, FormCollection collection)
         {
             try
             {
-                // TODO: Add update logic here
-
+                TeamModel teamModel = new TeamModel();
+                UpdateModel(teamModel);
+                TeamRepository.UpdateTeam(teamModel);
                 return RedirectToAction("Index");
             }
             catch
@@ -142,7 +165,7 @@ namespace IssueTracker.Controllers
                 teamModel.TeamId = TeamId;
                 TeamRepository.DeleteTeam(teamModel);
 
-                return RedirectToAction("Details", new { id = teamModel.TeamId });
+                return RedirectToAction("Index");
             }
             catch
             {

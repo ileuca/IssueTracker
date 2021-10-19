@@ -69,6 +69,10 @@ namespace IssueTracker.Repository
         public List<TeamModel> GetTeamsCreatedBy()
         {
             List<TeamModel> teamList = new List<TeamModel>();
+            if (GetCurrentUser() == null)
+            {
+                throw new HttpException();
+            }
             foreach (Team team in dbContext.Teams.Where(x => x.User.UserId == GetCurrentUser().UserId))
             {
                 teamList.Add(MapDbObjectToModel(team));
@@ -80,6 +84,13 @@ namespace IssueTracker.Repository
             return MapDbObjectToModel(dbContext.Teams.FirstOrDefault(x => x.TeamId == guid));
         }
         //Update
+        public void UpdateTeam(TeamModel teamModel)
+        {
+            Team existingTeam = dbContext.Teams.FirstOrDefault(x => x.TeamId == teamModel.TeamId);
+            existingTeam.TeamName = teamModel.TeamName;
+            existingTeam.TeamDescription = teamModel.TeamDescription;
+            dbContext.SubmitChanges();
+        }
         //Delete
         public void DeleteTeam(TeamModel teamModel)
         {

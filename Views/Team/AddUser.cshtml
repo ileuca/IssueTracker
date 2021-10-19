@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>AddUser</h2>
+<h2>Add User to Team</h2>
 
 
 @using (Html.BeginForm()) 
@@ -13,7 +13,6 @@
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>TeamViewModel</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -21,7 +20,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.UserId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <p class = "control-label col-md-2">Name Surname</p>
             <div class="col-md-10">
                 @Html.DropDownListFor(Model => Model.UserId, new SelectList(Model.userList, "UserId","UserName"))
                 @Html.ValidationMessageFor(model => model.UserId, "", new { @class = "text-danger" })
@@ -29,7 +28,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.TeamRoleId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <p class="control-label col-md-2">Role</p>
             <div class="col-md-10">
                 @Html.DropDownListFor(m => m.TeamRoleId, new SelectList(Model.userTeamRoleModelList, "userTeamRoleId", "UserTeamRoleName"))
                 @Html.ValidationMessageFor(model => model.TeamRoleId, "", new { @class = "text-danger" })

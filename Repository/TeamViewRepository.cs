@@ -32,6 +32,7 @@ namespace IssueTracker.Repository
             teamViewModel.TeamName = teamRepository.GetTeamById(teamGroupsModel.TeamId).TeamName;
             teamViewModel.TeamDescription = teamRepository.GetTeamById(teamGroupsModel.TeamId).TeamDescription;
             teamViewModel.UserId = teamGroupsModel.UserId;
+            teamViewModel.UserDescription = userRepository.GetUserById(teamGroupsModel.UserId).UserDescription;
             teamViewModel.UserNameSurname = userRepository.GetUserById(teamGroupsModel.UserId).UserName;
             teamViewModel.TeamRoleId = teamGroupsModel.UserTeamRoleId;
             teamViewModel.TeamRoleName = userTeamRoleRepository.GetTeamRoleModels().FirstOrDefault(x=>x.userTeamRoleId == teamGroupsModel.UserTeamRoleId).UserTeamRoleName;
@@ -134,6 +135,14 @@ namespace IssueTracker.Repository
         //bazeazate pe usersbyteamid si fa un roles by userid si rolesbyteamid
 
         //Update -- UpdateByUserID(Roluri) // UpdateByTeamID(Users)+Roluri?
+        public void UpdateTeamGroup(TeamViewModel teamViewModel)
+        {
+            TeamGroup existingTeamGroup = dbContext.TeamGroups
+                .Where(x => x.TeamId == teamViewModel.TeamId)
+                .FirstOrDefault(x => x.UserId == teamViewModel.UserId);
+            existingTeamGroup.UserTeamRoleId = teamViewModel.TeamRoleId;
+            dbContext.SubmitChanges();
+        }
 
         //Delete -- DeleteByUserID user din team Group // DeleteByTeamId (absolut Toate inregistrarile)
     }

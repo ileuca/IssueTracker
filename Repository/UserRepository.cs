@@ -82,7 +82,7 @@ namespace IssueTracker.Repository
         public void UpdateUser(UserModel userModel)
         {
             User existingUser = dbContext.Users.FirstOrDefault(x => x.UserId == userModel.UserId);
-            MapModelToDbObject(userModel);
+            existingUser = MapModelToDbObject(userModel);
             dbContext.SubmitChanges();
         }
         //Delete
