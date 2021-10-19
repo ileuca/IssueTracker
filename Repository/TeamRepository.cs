@@ -1,5 +1,6 @@
 ﻿using IssueTracker.Models;
 using IssueTracker.Models.DBObjects;
+using IssueTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,5 +81,6 @@ namespace IssueTracker.Repository
         }
         //Update
         //Delete
+
     }
 }

@@ -13,6 +13,7 @@ namespace IssueTracker.Controllers
         private Repository.TeamViewRepository TeamViewRepository = new Repository.TeamViewRepository();
         private Repository.UserRepository UserRepository = new Repository.UserRepository();
         private Repository.UserTeamRoleRepository UserTeamRoleRepository = new Repository.UserTeamRoleRepository();
+        private Repository.TeamGroupRepository TeamGroupRepository = new Repository.TeamGroupRepository();
 
         // GET: Team
         public ActionResult Index()
@@ -126,20 +127,26 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Team/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid TeamId, Guid UserId, Guid TeamRoleId)
         {
+            ViewBag.UserName = UserRepository.GetUserById(UserId).UserName;
+            ViewBag.TeamRoleName = UserTeamRoleRepository.GetTeamRoleModels().Find(x => x.userTeamRoleId == TeamRoleId).UserTeamRoleName;
             return View();
         }
 
         // POST: Team/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(Guid TeamId,Guid UserId,Guid TeamRoleId, FormCollection collection)
         {
             try
             {
-                // TODO: Add delete logic here
+                TeamViewModel teamViewModel = new TeamViewModel();
+                teamViewModel.UserId = UserId;
+                teamViewModel.TeamId = TeamId;
+                teamViewModel.TeamRoleId = TeamRoleId;
+                TeamGroupRepository.DeleteTeamGroup(teamViewModel);
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { id = teamViewModel.TeamId });
             }
             catch
             {

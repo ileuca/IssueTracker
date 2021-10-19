@@ -1,5 +1,6 @@
 ﻿using IssueTracker.Models;
 using IssueTracker.Models.DBObjects;
+using IssueTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +59,20 @@ namespace IssueTracker.Repository
             }
             return teamGroupModels;
         }
-        
+        public void DeleteTeamGroup(TeamViewModel teamViewModel)
+        {
+            TeamGroup dbTeamGroup = new TeamGroup();
+            foreach (var item in dbContext.TeamGroups)
+            {
+                if (item.UserId == teamViewModel.UserId && item.TeamId == teamViewModel.TeamId && item.UserTeamRoleId == teamViewModel.TeamRoleId)
+                {
+                    dbContext.TeamGroups.DeleteOnSubmit(item);
+                    dbContext.SubmitChanges();
+                    return;
+                }
+            }
+            return;
+        }
 
     }
 }
