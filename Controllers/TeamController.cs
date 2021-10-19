@@ -127,16 +127,39 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Team/Delete/5
-        public ActionResult Delete(Guid TeamId, Guid UserId, Guid TeamRoleId)
+        public ActionResult DeleteTeam(Guid TeamId)
+        {
+            ViewBag.TeamName = TeamRepository.GetTeamsCreatedBy().Find(x => x.TeamId == TeamId).TeamName;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult DeleteTeam(Guid TeamId, FormCollection collection)
+        {
+            try
+            {
+                TeamModel teamModel = new TeamModel();
+                teamModel.TeamId = TeamId;
+                TeamRepository.DeleteTeam(teamModel);
+
+                return RedirectToAction("Details", new { id = teamModel.TeamId });
+            }
+            catch
+            {
+                return View();
+            }
+        }
+        // GET: Team/Details/AddUser/Delete/5
+        public ActionResult DeleteUserFromTeam(Guid TeamId, Guid UserId, Guid TeamRoleId)
         {
             ViewBag.UserName = UserRepository.GetUserById(UserId).UserName;
             ViewBag.TeamRoleName = UserTeamRoleRepository.GetTeamRoleModels().Find(x => x.userTeamRoleId == TeamRoleId).UserTeamRoleName;
             return View();
         }
 
-        // POST: Team/Delete/5
+        // POST: Team/Details/AddUser/Delete/5
         [HttpPost]
-        public ActionResult Delete(Guid TeamId,Guid UserId,Guid TeamRoleId, FormCollection collection)
+        public ActionResult DeleteUserFromTeam(Guid TeamId,Guid UserId,Guid TeamRoleId, FormCollection collection)
         {
             try
             {

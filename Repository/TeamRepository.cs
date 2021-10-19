@@ -81,6 +81,22 @@ namespace IssueTracker.Repository
         }
         //Update
         //Delete
+        public void DeleteTeam(TeamModel teamModel)
+        {
+            Team existingTeam = dbContext.Teams.FirstOrDefault(x => x.TeamId == teamModel.TeamId);
+            if (existingTeam != null)
+            {
+                foreach(var teamGroup in dbContext.TeamGroups.Where(x=>x.TeamId == teamModel.TeamId))
+                {
+                    dbContext.TeamGroups.DeleteOnSubmit(teamGroup);
+                    dbContext.SubmitChanges();
+                }
+                dbContext.Teams.DeleteOnSubmit(existingTeam);
+                dbContext.SubmitChanges();
+                return;
+            }
+            return;
+        }
 
     }
 }

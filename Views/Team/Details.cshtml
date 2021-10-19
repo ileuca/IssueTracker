@@ -45,7 +45,7 @@
 
                 <td>
                     @Html.ActionLink("Details", "Details", new { id = item.TeamId }) |
-                    @Html.ActionLink("Delete", "Delete", new { TeamId = item.TeamId, UserId = item.UserId, TeamRoleId = item.TeamRoleId })
+                    @Html.ActionLink("Delete", "DeleteUserFromTeam", new { TeamId = item.TeamId, UserId = item.UserId, TeamRoleId = item.TeamRoleId })
                 </td>
             </tr>
             }
