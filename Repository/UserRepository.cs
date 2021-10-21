@@ -3,6 +3,7 @@ using IssueTracker.Models.DBObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 
 namespace IssueTracker.Repository
 {
@@ -56,6 +57,14 @@ namespace IssueTracker.Repository
             dbContext.SubmitChanges();
         }
         //Read
+        public User GetCurrentUser()
+        {
+            if (HttpContext.Current.User != null)
+            {
+                return dbContext.Users.FirstOrDefault(x => x.UserEmail == HttpContext.Current.User.Identity.Name);
+            }
+            return null;
+        }
         public UserModel GetUserById(Guid guid)
         {
             return MapDbObjectToModel(dbContext.Users.FirstOrDefault(x => x.UserId == guid));

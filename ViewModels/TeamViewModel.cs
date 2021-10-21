@@ -31,7 +31,6 @@ namespace IssueTracker.ViewModels
             userList = userRepository.GetAllUsers();
             userTeamRoleModelList = userTeamRoleRepository.GetTeamRoleModels();
         }
-
     }
 
 }

@@ -12,6 +12,8 @@ namespace IssueTracker.Repository
     public class TeamRepository
     {
         private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
+        private UserRepository UserRepository = new UserRepository();
+        private TeamGroupRepository TeamGroupRepository = new TeamGroupRepository();
 
         public TeamRepository()
         {
@@ -20,14 +22,6 @@ namespace IssueTracker.Repository
         public TeamRepository(Models.DBObjects.IssueTrackerModelsDataContext dbContext)
         {
             this.dbContext = dbContext;
-        }
-        private User GetCurrentUser()
-        {
-            if (HttpContext.Current.User != null)
-            {
-                return dbContext.Users.FirstOrDefault(x => x.UserEmail == HttpContext.Current.User.Identity.Name);
-            }
-            return null;
         }
         private TeamModel MapDbObjectToModel(Team dbTeam)
         {
@@ -61,19 +55,33 @@ namespace IssueTracker.Repository
         public  void CreateTeam(TeamModel teamModel)
         {
             teamModel.TeamId = Guid.NewGuid();
-            teamModel.CreatedBy = GetCurrentUser().UserId;
+            teamModel.CreatedBy = UserRepository.GetCurrentUser().UserId;
             dbContext.Teams.InsertOnSubmit(MapModelToDbObject(teamModel));
             dbContext.SubmitChanges();
         }
         //Read
+        public List<TeamModel> GetTeamsForCurrentUserId(Guid currentUserID)
+        {
+            List<TeamGroupsModel> teamGroupList = new List<TeamGroupsModel>();
+            List<TeamModel> teamModelList = new List<TeamModel>();
+            teamGroupList = TeamGroupRepository.GetAllTeamGroups().Where(x => x.UserId == currentUserID).ToList();
+            foreach(var teamGroup in teamGroupList)
+            {
+                if(!teamModelList.Exists(x=>x.TeamId == teamGroup.TeamId))
+                {
+                    teamModelList.Add(GetTeamById(teamGroup.TeamId));
+                }
+            }
+            return teamModelList;
+        }
         public List<TeamModel> GetTeamsCreatedBy()
         {
             List<TeamModel> teamList = new List<TeamModel>();
-            if (GetCurrentUser() == null)
+            if (UserRepository.GetCurrentUser() == null)
             {
-                throw new HttpException();
+                return teamList;
             }
-            foreach (Team team in dbContext.Teams.Where(x => x.User.UserId == GetCurrentUser().UserId))
+            foreach (Team team in dbContext.Teams.Where(x => x.User.UserId == UserRepository.GetCurrentUser().UserId))
             {
                 teamList.Add(MapDbObjectToModel(team));
             }
