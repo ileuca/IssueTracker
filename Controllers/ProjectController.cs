@@ -1,6 +1,7 @@
 ﻿using IssueTracker.Models;
 using IssueTracker.Models.DBObjects;
 using IssueTracker.Repository;
+using IssueTracker.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,19 +55,24 @@ namespace IssueTracker.Controllers
         [HttpPost]
         public ActionResult Create(FormCollection collection)
         {
-            //dynamic projects = new ExpandoObject();
+            ProjectModel projectModel = new ProjectModel();
             try
             {
-                ProjectModel projectModel = new ProjectModel();
-                UpdateModel(projectModel);
-                projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
-                projectRepository.CreateProject(projectModel);
 
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+
+                    UpdateModel(projectModel);
+                    projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    projectRepository.CreateProject(projectModel);
+
+                    return RedirectToAction("Index");
+                }
+                return View(projectModel);
             }
             catch
             {
-                return View();
+                return View(projectModel);
             }
         }
 
