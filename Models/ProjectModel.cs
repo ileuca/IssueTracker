@@ -15,10 +15,10 @@ namespace IssueTracker.Models
         [Required]
         public string ProjectDescription { get; set; }
 
-        [Required]
+
         [DateCheck("StartDate", "EndDate", Compare.LessThan)]
         public DateTime? StartDate { get; set; }
-        [Required]
+
         [DateCheck("EndDate","StartDate", Compare.GreaterThan)]
         public DateTime? EndDate { get; set; }
         public Guid StatusId { get; set; }

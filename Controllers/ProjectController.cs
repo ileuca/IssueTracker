@@ -63,6 +63,7 @@ namespace IssueTracker.Controllers
                 {
 
                     UpdateModel(projectModel);
+                    //de modificat sa verifice datele pentru status
                     projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
                     projectRepository.CreateProject(projectModel);
 
@@ -77,41 +78,48 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Project/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(Guid ProjectId)
         {
-            return View();
+            ProjectModel projectModel = projectRepository.GetProjectByProjectId(ProjectId);
+            return View(projectModel);
         }
 
         // POST: Project/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(Guid ProjectId, FormCollection collection)
         {
+            ProjectModel projectModel = new ProjectModel();
             try
             {
-                // TODO: Add update logic here
+                UpdateModel(projectModel);
+                //de modificat sa verifice datele pentru status
+                projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                projectRepository.UpdateProject(projectModel);
 
                 return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(projectModel);
             }
-        }
+}
 
         // GET: Project/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid ProjectId)
         {
             return View();
         }
 
         // POST: Project/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(Guid ProjectId, FormCollection collection)
         {
+            ProjectModel projectModel = new ProjectModel();
+
             try
             {
-                // TODO: Add delete logic here
-
+                projectModel = projectRepository.GetProjectByProjectId(ProjectId);
+                projectRepository.DeleteProject(projectModel);
                 return RedirectToAction("Index");
             }
             catch

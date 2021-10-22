@@ -24,28 +24,37 @@ namespace IssueTracker.Repository
         public Project MapModelToDbObject(ProjectModel projectModel)
         {
             Project dbProject = new Project();
-            dbProject.ProjectId = projectModel.ProjectId;
-            dbProject.TeamId = projectModel.TeamId;
-            dbProject.ProjectName = projectModel.ProjectName;
-            dbProject.ProjectDescription = projectModel.ProjectDescription;
-            dbProject.StartDate = projectModel.StartDate;
-            dbProject.EndDate = projectModel.EndDate;
-            dbProject.StatusId = projectModel.StatusId;
+            if (projectModel != null)
+            {
+                dbProject.ProjectId = projectModel.ProjectId;
+                dbProject.TeamId = projectModel.TeamId;
+                dbProject.ProjectName = projectModel.ProjectName;
+                dbProject.ProjectDescription = projectModel.ProjectDescription;
+                dbProject.StartDate = projectModel.StartDate;
+                dbProject.EndDate = projectModel.EndDate;
+                dbProject.StatusId = projectModel.StatusId;
 
-            return dbProject;
+                return dbProject;
+            }
+
+            return null;
         }
         public ProjectModel MapDbObjectToModel(Project dbProject)
         {
             ProjectModel projectModel = new ProjectModel();
-            projectModel.ProjectId = dbProject.ProjectId;
-            projectModel.TeamId = dbProject.TeamId;
-            projectModel.ProjectName = dbProject.ProjectName;
-            projectModel.ProjectDescription = dbProject.ProjectDescription;
-            projectModel.StartDate = dbProject.StartDate;
-            projectModel.EndDate = dbProject.EndDate;
-            projectModel.StatusId = dbProject.StatusId;
+            if (dbProject != null)
+            {
+                projectModel.ProjectId = dbProject.ProjectId;
+                projectModel.TeamId = dbProject.TeamId;
+                projectModel.ProjectName = dbProject.ProjectName;
+                projectModel.ProjectDescription = dbProject.ProjectDescription;
+                projectModel.StartDate = dbProject.StartDate;
+                projectModel.EndDate = dbProject.EndDate;
+                projectModel.StatusId = dbProject.StatusId;
 
-            return projectModel;
+                return projectModel;
+            }
+            return null;
         }
 
         //Create
@@ -66,12 +75,24 @@ namespace IssueTracker.Repository
             }
             return teamProjects;
         }
+        public ProjectModel GetProjectByProjectId(Guid ProjectId)
+        {
+            ProjectModel projectModel = new ProjectModel();
+            Project dbProject = dbContext.Projects.FirstOrDefault(x => x.ProjectId == ProjectId);
+            projectModel = MapDbObjectToModel(dbProject);
+            return projectModel;
+        }
 
         //Update
         public void UpdateProject(ProjectModel projectModel)
         {
             Project existingProject = dbContext.Projects.FirstOrDefault(x => x.ProjectId == projectModel.ProjectId);
-            existingProject = MapModelToDbObject(projectModel);
+            existingProject.TeamId = projectModel.TeamId;
+            existingProject.ProjectName = projectModel.ProjectName;
+            existingProject.ProjectDescription = projectModel.ProjectDescription;
+            existingProject.StartDate = projectModel.StartDate;
+            existingProject.EndDate = projectModel.EndDate;
+            existingProject.StatusId = projectModel.StatusId;
             dbContext.SubmitChanges();
         }
 
