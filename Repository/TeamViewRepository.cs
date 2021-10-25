@@ -79,7 +79,7 @@ namespace IssueTracker.Repository
             {
                 foreach (UserModel userModel in userList)
                 {
-                    if (userModel.UserId == teamGroupModel.UserId && teamId == teamGroupModel.UserId)
+                    if (userModel.UserId == teamGroupModel.UserId && teamId == teamGroupModel.TeamId)
                     {
                         userListByTeam.Add(userModel);
                     }

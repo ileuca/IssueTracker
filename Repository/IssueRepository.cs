@@ -65,7 +65,15 @@ namespace IssueTracker.Repository
         }
 
         //Read
-
+        public List<IssueModel> GetIssuesByProjectId(Guid ProjectId)
+        {
+            List<IssueModel> issuesByProject = new List<IssueModel>();
+            foreach(var issue in dbContext.Issues.Where(x => x.ProjectId == ProjectId))
+            {
+                issuesByProject.Add(MapDbObjectToModel(issue));
+            }
+            return issuesByProject;
+        }
 
         //Update
 
