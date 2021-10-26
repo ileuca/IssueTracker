@@ -10,6 +10,7 @@ namespace IssueTracker.Repository
     public class IssueRepository
     {
         private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
+        private ProjectRepository projectRepository = new ProjectRepository();
 
         public IssueRepository()
         {
@@ -74,11 +75,43 @@ namespace IssueTracker.Repository
             }
             return issuesByProject;
         }
+        public IssueModel GetIssueById(Guid IssueId)
+        {
+            IssueModel issueModel = MapDbObjectToModel(dbContext.Issues.FirstOrDefault(i => i.IssueId == IssueId));
+            return issueModel;
+        }
+        public Guid GetTeamIdByIssueId(Guid IssueId)
+        {
+            ProjectModel projectModel = projectRepository.GetProjectByProjectId(GetIssueById(IssueId).ProjectId);
+            return projectModel.TeamId;
+        }
 
         //Update
+        public void UpdateIssue(IssueModel issueModel)
+        {
 
+            Issue existingIssue = dbContext.Issues.FirstOrDefault(i => i.IssueId == issueModel.IssueId);
+            if(existingIssue !=null)
+            {
+                existingIssue.IssueName = issueModel.IssueName;
+                existingIssue.IssueDescription = issueModel.IssueDescription;
+                existingIssue.StartDate = issueModel.StartDate;
+                existingIssue.EndDate = issueModel.EndDate;
+                dbContext.SubmitChanges();
+            }
+        }
         //Delete
-
+        public void DeleteIssue(IssueModel issueModel)
+        {
+            Issue existingIssue = dbContext.Issues.FirstOrDefault(i => i.IssueId == issueModel.IssueId);
+            var actionsForIssue = dbContext.Actions.Where(a => a.IssueId == issueModel.IssueId);
+            if (existingIssue != null)
+            {
+                dbContext.Actions.DeleteAllOnSubmit(actionsForIssue);
+                dbContext.Issues.DeleteOnSubmit(existingIssue);
+                dbContext.SubmitChanges();
+            }
+        }
     }
 
 

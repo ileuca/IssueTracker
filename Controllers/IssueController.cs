@@ -67,42 +67,48 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Issue/Edit/5
-        public ActionResult Edit(Guid ProjectId)
+        public ActionResult Edit(Guid IssueId)
         {
-            return View();
+            IssueModel issueModel = issueRepository.GetIssueById(IssueId);
+            return View(issueModel);
         }
 
         // POST: Issue/Edit/5
         [HttpPost]
-        public ActionResult Edit(Guid ProjectId, FormCollection collection)
+        public ActionResult Edit(FormCollection collection)
         {
+            IssueModel issueModel = new IssueModel();
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                UpdateModel(issueModel);
+                issueRepository.UpdateIssue(issueModel);
+                return RedirectToAction("Index",new { TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId), ProjectId = issueModel.ProjectId});
             }
             catch
             {
-                return View();
+                return View(issueModel);
             }
         }
 
         // GET: Issue/Delete/5
-        public ActionResult Delete(Guid ProjectId)
+        public ActionResult Delete(Guid IssueId)
         {
             return View();
         }
 
         // POST: Issue/Delete/5
         [HttpPost]
-        public ActionResult Delete(Guid ProjectId, FormCollection collection)
+        public ActionResult Delete(Guid IssueId, FormCollection collection)
         {
+            IssueModel issueModel = issueRepository.GetIssueById(IssueId);
             try
             {
-                // TODO: Add delete logic here
+                Guid TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId);
+                issueRepository.DeleteIssue(issueModel);
 
-                return RedirectToAction("Index");
+
+                //Issue nu mai exista ca e ster trebuie teamId din alta parte??
+                return RedirectToAction("Index", new { TeamId = TeamId , ProjectId = issueModel.ProjectId });
             }
             catch
             {

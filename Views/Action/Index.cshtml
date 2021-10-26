@@ -1,0 +1,70 @@
+﻿@model IEnumerable<IssueTracker.Models.ActionModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create","Action",new { IssueId = ViewBag.IssueId},null)
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ActionId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IssueId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ActionName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ActionDescription)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StartDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EndDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StatusId)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ActionId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IssueId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ActionName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ActionDescription)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StartDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EndDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StatusId)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { ActionId = item.ActionId }) |
+            @Html.ActionLink("Details", "Details", new { ActionId = item.ActionId }) |
+            @Html.ActionLink("Delete", "Delete", new { ActionId = item.ActionId })
+        </td>
+    </tr>
+}
+
+</table>
