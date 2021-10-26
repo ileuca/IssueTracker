@@ -55,42 +55,46 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Action/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(Guid ActionId)
         {
-            return View();
+            ActionModel actionToEdit = actionRepository.GetActionById(ActionId);
+            return View(actionToEdit);
         }
 
         // POST: Action/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(FormCollection collection)
         {
+            ActionModel editedAction = new ActionModel();
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                UpdateModel(editedAction);
+                actionRepository.UpdateAction(editedAction);
+                return RedirectToAction("Index",new { IssueId = editedAction.IssueId});
             }
             catch
             {
-                return View();
+                return View(editedAction);
             }
         }
 
         // GET: Action/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid ActionId)
         {
-            return View();
+            ActionModel actiontoDelete = actionRepository.GetActionById(ActionId);
+            return View(actiontoDelete);
         }
 
         // POST: Action/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(Guid ActionId,FormCollection collection)
         {
+            ActionModel actionToDelete = actionRepository.GetActionById(ActionId);
             try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
+            {   
+                Guid IssueId = actionToDelete.IssueId;
+                actionRepository.DeleteAction(actionToDelete);
+                return RedirectToAction("Index",new { IssueId = IssueId});
             }
             catch
             {

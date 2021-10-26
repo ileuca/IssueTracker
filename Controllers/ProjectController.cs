@@ -16,6 +16,7 @@ namespace IssueTracker.Controllers
         private UserRepository UserRepository = new UserRepository();
         private TeamRepository TeamRepository = new TeamRepository();
         private StatusRepository StatusRepository = new StatusRepository();
+        private ActionRepository ActionRepository = new ActionRepository();
 
         // GET: Project
         public ActionResult Index()

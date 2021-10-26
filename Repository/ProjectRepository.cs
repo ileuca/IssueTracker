@@ -102,8 +102,14 @@ namespace IssueTracker.Repository
         {
             Project existingProject = dbContext.Projects.FirstOrDefault(x => x.ProjectId == projectModel.ProjectId);
             var issues = dbContext.Issues.Where(i => i.ProjectId == existingProject.ProjectId);
+
             if (existingProject !=null)
             {
+                foreach (var issue in issues)
+                {
+                    var actions = dbContext.Actions.Where(a => a.IssueId == issue.IssueId);
+                    dbContext.Actions.DeleteAllOnSubmit(actions);
+                }
                 dbContext.Issues.DeleteAllOnSubmit(issues);
                 dbContext.Projects.DeleteOnSubmit(existingProject);
                 dbContext.SubmitChanges();

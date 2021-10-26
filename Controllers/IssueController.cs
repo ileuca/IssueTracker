@@ -105,9 +105,6 @@ namespace IssueTracker.Controllers
             {
                 Guid TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId);
                 issueRepository.DeleteIssue(issueModel);
-
-
-                //Issue nu mai exista ca e ster trebuie teamId din alta parte??
                 return RedirectToAction("Index", new { TeamId = TeamId , ProjectId = issueModel.ProjectId });
             }
             catch

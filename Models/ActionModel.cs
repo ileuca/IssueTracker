@@ -1,4 +1,6 @@
-﻿using System;
+﻿using IssueTracker.Validation;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace IssueTracker.Models
 {
@@ -8,7 +10,9 @@ namespace IssueTracker.Models
         public Guid IssueId { get; set; }
         public string ActionName { get; set; }
         public string ActionDescription { get; set; }
+        [DateCheck("StartDate", "EndDate", Compare.LessThan)]
         public DateTime? StartDate { get; set; }
+        [DateCheck("EndDate", "StartDate", Compare.GreaterThan)]
         public DateTime? EndDate { get; set; }
         public Guid StatusId { get; set; }
 

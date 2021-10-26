@@ -98,7 +98,7 @@ namespace IssueTracker.Repository
         public void DeleteAction(ActionModel actionModel)
         {
             var existingAction = dbContext.Actions.FirstOrDefault(a => a.ActionId == actionModel.ActionId);
-            dbContext.Actions.DeleteOnSubmit(MapModelToDbObject(actionModel));
+            dbContext.Actions.DeleteOnSubmit(existingAction);
             dbContext.SubmitChanges();
         }
 
