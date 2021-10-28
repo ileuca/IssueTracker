@@ -1,14 +1,12 @@
 ﻿using IssueTracker.Models;
 using System.Collections.Generic;
 using IssueTracker.Models.DBObjects;
-using System;
 
 namespace IssueTracker.Repository
 {
     public class UserTeamRoleRepository
     {
-
-        private IssueTrackerModelsDataContext dbContext;
+        private readonly IssueTrackerModelsDataContext dbContext;
 
         public UserTeamRoleRepository()
         {
@@ -23,14 +21,13 @@ namespace IssueTracker.Repository
             UserTeamRoleModel userTeamRoleModel = new UserTeamRoleModel();
             if (dbUserTeamRole != null)
             {
-                userTeamRoleModel.userTeamRoleId = dbUserTeamRole.UserTeamRoleId;
+                userTeamRoleModel.UserTeamRoleId = dbUserTeamRole.UserTeamRoleId;
                 userTeamRoleModel.UserTeamRoleName = dbUserTeamRole.UserTeamRoleName;
 
                 return userTeamRoleModel;
             }
             return null;
         }
-
         //Read
         public List<UserTeamRoleModel> GetTeamRoleModels()
         {
@@ -41,6 +38,5 @@ namespace IssueTracker.Repository
             }
             return userTeamRoleModelList;
         }
-
     }
 }

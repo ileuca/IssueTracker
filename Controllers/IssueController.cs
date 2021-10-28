@@ -1,46 +1,35 @@
 ﻿using IssueTracker.Models;
-using IssueTracker.Models.DBObjects;
 using IssueTracker.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace IssueTracker.Controllers
 {
     public class IssueController : Controller
     {
-        private IssueRepository issueRepository = new IssueRepository();
-        private UserRepository userRepository = new UserRepository();
-        private TeamViewRepository teamViewRepository = new TeamViewRepository();
-        private StatusRepository StatusRepository = new StatusRepository();
-
-        // GET: Issue
+        private readonly IssueRepository issueRepository = new IssueRepository();
+        private readonly UserRepository userRepository = new UserRepository();
+        private readonly TeamViewRepository teamViewRepository = new TeamViewRepository();
+        private readonly StatusRepository StatusRepository = new StatusRepository();
         public ActionResult Index(Guid TeamId, Guid ProjectId)
         {
-
             ViewBag.TeamId = TeamId;
             ViewBag.Projectid = ProjectId;
             List<IssueModel> issuesByProjectId = issueRepository.GetIssuesByProjectId(ProjectId);
             return View("Index", issuesByProjectId);
         }
-
-        // GET: Issue/Details/5
         public ActionResult Details(Guid ProjectId)
         {
             return View();
         }
-
-        // GET: Issue/Create
         public ActionResult Create(Guid TeamId)
         {
             List<UserModel> userList = teamViewRepository.GetUsersByTeamId(TeamId);
             ViewBag.UserFromTeam = userList;
             return View();
         }
-
-        // POST: Issue/Create
         [HttpPost]
         public ActionResult Create(Guid ProjectId, Guid TeamId, FormCollection collection)
         {
@@ -55,8 +44,7 @@ namespace IssueTracker.Controllers
                     issueModel.ProjectId = ProjectId;
                     issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
                     issueRepository.CreateIssue(issueModel);
-
-                    return RedirectToAction("Index", new { TeamId = TeamId, ProjectId = ProjectId });
+                    return RedirectToAction("Index", new { TeamId, ProjectId });
                 }
                 return View();
             }
@@ -65,15 +53,11 @@ namespace IssueTracker.Controllers
                 return View();
             }
         }
-
-        // GET: Issue/Edit/5
         public ActionResult Edit(Guid IssueId)
         {
             IssueModel issueModel = issueRepository.GetIssueById(IssueId);
             return View(issueModel);
         }
-
-        // POST: Issue/Edit/5
         [HttpPost]
         public ActionResult Edit(FormCollection collection)
         {
@@ -82,21 +66,17 @@ namespace IssueTracker.Controllers
             {
                 UpdateModel(issueModel);
                 issueRepository.UpdateIssue(issueModel);
-                return RedirectToAction("Index",new { TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId), ProjectId = issueModel.ProjectId});
+                return RedirectToAction("Index",new { TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId), issueModel.ProjectId});
             }
             catch
             {
                 return View(issueModel);
             }
         }
-
-        // GET: Issue/Delete/5
         public ActionResult Delete(Guid IssueId)
         {
             return View();
         }
-
-        // POST: Issue/Delete/5
         [HttpPost]
         public ActionResult Delete(Guid IssueId, FormCollection collection)
         {
@@ -105,7 +85,7 @@ namespace IssueTracker.Controllers
             {
                 Guid TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId);
                 issueRepository.DeleteIssue(issueModel);
-                return RedirectToAction("Index", new { TeamId = TeamId , ProjectId = issueModel.ProjectId });
+                return RedirectToAction("Index", new { TeamId, issueModel.ProjectId });
             }
             catch
             {

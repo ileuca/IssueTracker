@@ -81,7 +81,7 @@ namespace IssueTracker.Controllers
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, model.RememberMe });
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
@@ -153,8 +153,6 @@ namespace IssueTracker.Controllers
                 Models.DBObjects.IssueTrackerModelsDataContext dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
                 dbContext.Users.InsertOnSubmit(new Models.DBObjects.User { UserId = user.UserId, UserEmail = user.Email, UserName = user.UserNameSurname });
                 dbContext.SubmitChanges();
-
-                var plm = User.Identity.Name;
 
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -319,7 +317,7 @@ namespace IssueTracker.Controllers
             {
                 return View("Error");
             }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, model.ReturnUrl, model.RememberMe });
         }
 
         //

@@ -9,8 +9,7 @@ namespace IssueTracker.Repository
 {
     public class UserRepository
     {
-        private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
-
+        private readonly Models.DBObjects.IssueTrackerModelsDataContext dbContext;
         public UserRepository()
         {
             this.dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
@@ -28,33 +27,9 @@ namespace IssueTracker.Repository
                 userModel.UserName = dbUser.UserName;
                 userModel.UserEmail = dbUser.UserEmail;
                 userModel.UserDescription = dbUser.UserDescription;
-
                 return userModel;
             }
             return null;
-        }
-
-
-        private User MapModelToDbObject(UserModel userModel)
-        {
-            User dbUser = new User();
-            if (userModel != null)
-            {
-                dbUser.UserId = userModel.UserId;
-                dbUser.UserName = userModel.UserName;
-                dbUser.UserEmail = userModel.UserEmail;
-                dbUser.UserDescription = userModel.UserDescription;
-
-                return dbUser;
-            }
-            return null;
-        }
-        //Create
-        public void CreateUser(UserModel userModel)
-        {
-            userModel.UserId = Guid.NewGuid();
-            dbContext.Users.InsertOnSubmit(MapModelToDbObject(userModel));
-            dbContext.SubmitChanges();
         }
         //Read
         public User GetCurrentUser()
@@ -78,32 +53,5 @@ namespace IssueTracker.Repository
             }
             return usersList;
         }
-        public List<UserModel> GetUserByTeam(Team team)
-        {
-            List<UserModel> usersByTeamList = new List<UserModel>();
-            foreach(TeamGroup teamGroup in dbContext.TeamGroups.Where(x=>x.TeamId == team.TeamId))
-            {
-                usersByTeamList.Add(GetUserById(teamGroup.UserId));
-            }
-            return usersByTeamList;
-        }
-        //Update
-        public void UpdateUser(UserModel userModel)
-        {
-            User existingUser = dbContext.Users.FirstOrDefault(x => x.UserId == userModel.UserId);
-            existingUser = MapModelToDbObject(userModel);
-            dbContext.SubmitChanges();
-        }
-        //Delete
-        public void DeleteUser(UserModel userModel)
-        {
-            User existingUser = dbContext.Users.FirstOrDefault(x => x.UserId == userModel.UserId);
-            if(existingUser != null)
-            {
-                dbContext.Users.DeleteOnSubmit(existingUser);
-                dbContext.SubmitChanges();
-            }
-        }
-
     }
 }

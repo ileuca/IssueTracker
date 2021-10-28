@@ -4,18 +4,16 @@ using IssueTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace IssueTracker.Repository
 {
     public class TeamViewRepository
     {
-        private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
-        private UserRepository userRepository = new UserRepository();
-        private TeamRepository teamRepository = new TeamRepository();
-        private TeamGroupRepository teamGroupRepository = new TeamGroupRepository();
-        private UserTeamRoleRepository userTeamRoleRepository = new UserTeamRoleRepository();
-
+        private readonly Models.DBObjects.IssueTrackerModelsDataContext dbContext;
+        private readonly UserRepository userRepository = new UserRepository();
+        private readonly TeamRepository teamRepository = new TeamRepository();
+        private readonly TeamGroupRepository teamGroupRepository = new TeamGroupRepository();
+        private readonly UserTeamRoleRepository userTeamRoleRepository = new UserTeamRoleRepository();
         public TeamViewRepository()
         {
             this.dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
@@ -24,56 +22,43 @@ namespace IssueTracker.Repository
         {
             this.dbContext = dbContext;
         }
-
         public TeamViewModel MapModelsToTeamViewModel(TeamGroupsModel teamGroupsModel)
         {
-            TeamViewModel teamViewModel = new TeamViewModel();
-            teamViewModel.TeamId = teamGroupsModel.TeamId;
-            teamViewModel.TeamName = teamRepository.GetTeamById(teamGroupsModel.TeamId).TeamName;
-            teamViewModel.TeamDescription = teamRepository.GetTeamById(teamGroupsModel.TeamId).TeamDescription;
-            teamViewModel.UserId = teamGroupsModel.UserId;
-            teamViewModel.UserDescription = userRepository.GetUserById(teamGroupsModel.UserId).UserDescription;
-            teamViewModel.UserNameSurname = userRepository.GetUserById(teamGroupsModel.UserId).UserName;
-            teamViewModel.TeamRoleId = teamGroupsModel.UserTeamRoleId;
-            teamViewModel.TeamRoleName = userTeamRoleRepository.GetTeamRoleModels().FirstOrDefault(x=>x.userTeamRoleId == teamGroupsModel.UserTeamRoleId).UserTeamRoleName;
-
+            TeamViewModel teamViewModel = new TeamViewModel
+            {
+                TeamId = teamGroupsModel.TeamId,
+                TeamName = teamRepository.GetTeamById(teamGroupsModel.TeamId).TeamName,
+                TeamDescription = teamRepository.GetTeamById(teamGroupsModel.TeamId).TeamDescription,
+                UserId = teamGroupsModel.UserId,
+                UserDescription = userRepository.GetUserById(teamGroupsModel.UserId).UserDescription,
+                UserNameSurname = userRepository.GetUserById(teamGroupsModel.UserId).UserName,
+                TeamRoleId = teamGroupsModel.UserTeamRoleId,
+                TeamRoleName = userTeamRoleRepository.GetTeamRoleModels().FirstOrDefault(x => x.UserTeamRoleId == teamGroupsModel.UserTeamRoleId).UserTeamRoleName
+            };
             return teamViewModel;
-
         }
         public TeamGroup MapTeamViewModelToTeamGroup(TeamViewModel teamViewModel)
         {
-            TeamGroup teamGroup = new TeamGroup();
-            //teamGroup.TeamGroupId = teamGroupRepository.GetAllTeamGroups().Count + 1;
-            teamGroup.TeamId = teamViewModel.TeamId;
-            teamGroup.UserId = teamViewModel.UserId;
-            teamGroup.UserTeamRoleId = teamViewModel.TeamRoleId;
-
+            TeamGroup teamGroup = new TeamGroup
+            {
+                TeamId = teamViewModel.TeamId,
+                UserId = teamViewModel.UserId,
+                UserTeamRoleId = teamViewModel.TeamRoleId
+            };
             return teamGroup;
         }
-
         //Create -- CreateTeamView(CreateTeam + CreateTeamGroup)
         public void CreateTeamGroup(TeamViewModel teamViewModel)
         {  
             dbContext.TeamGroups.InsertOnSubmit(MapTeamViewModelToTeamGroup(teamViewModel));
             dbContext.SubmitChanges();
         }
-
         //Read
-        //GetAllUsers(sa poata fi adaugati in Team)
-        public List<UserModel> GetAllusers()
-        {
-            List<UserModel> userList = new List<UserModel>();
-            userList = userRepository.GetAllUsers();
-            return userList;
-        }
-        //GetUsersByTeamId(sa poata fi afisati in detalii)
         public List<UserModel> GetUsersByTeamId(Guid teamId)
         {
-            List<UserModel> userList = new List<UserModel>();
-            List<TeamGroupsModel> teamGroupModelList = new List<TeamGroupsModel>();
+            List<UserModel> userList = userRepository.GetAllUsers();
+            List<TeamGroupsModel> teamGroupModelList = teamGroupRepository.GetAllTeamGroups();
             List<UserModel> userListByTeam = new List<UserModel>();
-            teamGroupModelList = teamGroupRepository.GetAllTeamGroups();
-            userList = userRepository.GetAllUsers();
 
             foreach (TeamGroupsModel teamGroupModel in teamGroupModelList)
             {
@@ -87,14 +72,6 @@ namespace IssueTracker.Repository
             }
             return userListByTeam;
         }
-        //GetTeamNameByID
-        public string GetTeamNameById(Guid teamId)
-        {
-            TeamViewModel teamViewModel = new TeamViewModel();
-            teamViewModel.TeamName = teamRepository.GetTeamById(teamId).TeamName;
-            return teamViewModel.TeamName;
-        }
-        //getAllTEamViewModels
         public List<TeamViewModel> GetAllTeamViewModels()
         {
             List<TeamViewModel> teamViewModels = new List<TeamViewModel>();
@@ -116,25 +93,12 @@ namespace IssueTracker.Repository
             }
             return teamViewModels;
         }
-        //GetTeamRoles
-        public List<UserTeamRoleModel> GetAllTeamRoles()
-        {
-            List<UserTeamRoleModel> userTeamRoleModels = new List<UserTeamRoleModel>();
-            userTeamRoleModels = userTeamRoleRepository.GetTeamRoleModels();
-            return userTeamRoleModels;
-        }
         //GetAllTEamGroups
         public List<TeamGroupsModel> GetAllTeamGroups()
         {
-            List<TeamGroupsModel> teamGroupsModels = new List<TeamGroupsModel>();
-            teamGroupsModels = teamGroupRepository.GetAllTeamGroups();
-            return teamGroupsModels;
-
+            return teamGroupRepository.GetAllTeamGroups();
         }
-        //GetAllTeamViewModels?
-        //bazeazate pe usersbyteamid si fa un roles by userid si rolesbyteamid
-
-        //Update -- UpdateByUserID(Roluri) // UpdateByTeamID(Users)+Roluri?
+        //Update
         public void UpdateTeamGroup(TeamViewModel teamViewModel)
         {
             TeamGroup existingTeamGroup = dbContext.TeamGroups
@@ -143,8 +107,6 @@ namespace IssueTracker.Repository
             existingTeamGroup.UserTeamRoleId = teamViewModel.TeamRoleId;
             dbContext.SubmitChanges();
         }
-
-        //Delete -- DeleteByUserID user din team Group // DeleteByTeamId (absolut Toate inregistrarile)
     }
 
 }

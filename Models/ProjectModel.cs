@@ -15,7 +15,6 @@ namespace IssueTracker.Models
         [Required]
         public string ProjectDescription { get; set; }
 
-
         [DateCheck("StartDate", "EndDate", Compare.LessThan)]
         public DateTime? StartDate { get; set; }
 
@@ -23,11 +22,11 @@ namespace IssueTracker.Models
         public DateTime? EndDate { get; set; }
         public Guid StatusId { get; set; }
 
-        public List<TeamModel> teamList { get; set; }
+        public List<TeamModel> TeamList { get; set; }
         public ProjectModel()
         {
             TeamRepository teamRepository = new TeamRepository();
-            teamList = teamRepository.GetTeamsCreatedBy();
+            TeamList = teamRepository.GetTeamsCreatedBy();
         }
 
     }

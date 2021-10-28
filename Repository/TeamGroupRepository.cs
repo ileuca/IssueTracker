@@ -1,18 +1,13 @@
 ﻿using IssueTracker.Models;
 using IssueTracker.Models.DBObjects;
 using IssueTracker.ViewModels;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace IssueTracker.Repository
 {
     public class TeamGroupRepository
     {
-        private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
-        private UserRepository userRepository = new UserRepository();
-
+        private readonly Models.DBObjects.IssueTrackerModelsDataContext dbContext;
         public TeamGroupRepository()
         {
             this.dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
@@ -21,13 +16,12 @@ namespace IssueTracker.Repository
         {
             this.dbContext = dbContext;
         }
-    
-
         private TeamGroupsModel MapDbObjectToModel(TeamGroup dbteamGroup)
         {
             TeamGroupsModel teamGroupModel = new TeamGroupsModel();
             if (dbteamGroup != null)
             {
+                teamGroupModel.TeamGroupId = dbteamGroup.TeamGroupID;
                 teamGroupModel.TeamId = dbteamGroup.TeamId;
                 teamGroupModel.UserId = dbteamGroup.UserId;
                 teamGroupModel.UserTeamRoleId = dbteamGroup.UserTeamRoleId;
@@ -41,6 +35,7 @@ namespace IssueTracker.Repository
             TeamGroup dbteamGroup = new TeamGroup();
             if (dbteamGroup != null)
             {
+                dbteamGroup.TeamGroupID = teamGroupModel.TeamGroupId;
                 dbteamGroup.TeamId = teamGroupModel.TeamId;
                 dbteamGroup.UserId = teamGroupModel.UserId;
                 dbteamGroup.UserTeamRoleId = teamGroupModel.UserTeamRoleId;
@@ -48,6 +43,11 @@ namespace IssueTracker.Repository
                 return dbteamGroup;
             }
             return null;
+        }
+        public void CreateTeamGroup(TeamGroupsModel teamGroupsModel)
+        {
+            dbContext.TeamGroups.InsertOnSubmit(MapModelToDbObject(teamGroupsModel));
+            dbContext.SubmitChanges();
         }
 
         public List<TeamGroupsModel> GetAllTeamGroups()
@@ -61,7 +61,6 @@ namespace IssueTracker.Repository
         }
         public void DeleteTeamGroup(TeamViewModel teamViewModel)
         {
-            TeamGroup dbTeamGroup = new TeamGroup();
             foreach (var item in dbContext.TeamGroups)
             {
                 if (item.UserId == teamViewModel.UserId && item.TeamId == teamViewModel.TeamId && item.UserTeamRoleId == teamViewModel.TeamRoleId)
@@ -73,6 +72,5 @@ namespace IssueTracker.Repository
             }
             return;
         }
-
     }
 }

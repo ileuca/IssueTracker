@@ -20,7 +20,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.TeamId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(m => m.TeamId, new SelectList(Model.teamList, "TeamId", "TeamName"), new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.TeamId, new SelectList(Model.TeamList, "TeamId", "TeamName"), new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.TeamId, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -76,7 +76,7 @@
     <script>
         $(document).ready(function () {
             $(".datepicker").datepicker({
-                dateFormat: "mm/dd/yy",
+                dateFormat: "yy-mm-dd",
                 changemonth: true,
                 changeyear: true
             });

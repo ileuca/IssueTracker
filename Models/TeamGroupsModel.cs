@@ -1,5 +1,4 @@
-﻿using IssueTracker.Repository;
-using System;
+﻿using System;
 
 namespace IssueTracker.Models
 {

@@ -1,20 +1,17 @@
 ﻿using IssueTracker.Models;
 using IssueTracker.Models.DBObjects;
-using IssueTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Security;
 
 namespace IssueTracker.Repository
 {
     public class TeamRepository
     {
-        private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
-        private UserRepository UserRepository = new UserRepository();
-        private TeamGroupRepository TeamGroupRepository = new TeamGroupRepository();
-
+        private readonly Models.DBObjects.IssueTrackerModelsDataContext dbContext;
+        private readonly UserRepository userRepository = new UserRepository();
+        private readonly TeamGroupRepository teamGroupRepository = new TeamGroupRepository();
+        private readonly UserTeamRoleRepository userTeamRoleRepository = new UserTeamRoleRepository();
         public TeamRepository()
         {
             this.dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
@@ -32,7 +29,6 @@ namespace IssueTracker.Repository
                 teamModel.TeamName = dbTeam.TeamName;
                 teamModel.TeamDescription = dbTeam.TeamDescription;
                 teamModel.CreatedBy = dbTeam.CreatedBy;
-
                 return teamModel;
             }
             return null;
@@ -46,7 +42,6 @@ namespace IssueTracker.Repository
                 dbTeam.TeamName = teamModel.TeamName;
                 dbTeam.TeamDescription = teamModel.TeamDescription;
                 dbTeam.CreatedBy = teamModel.CreatedBy;
-
                 return dbTeam;
             }
             return null;
@@ -54,17 +49,22 @@ namespace IssueTracker.Repository
         //Create
         public  void CreateTeam(TeamModel teamModel)
         {
+            TeamGroupsModel teamGroupModel = new TeamGroupsModel();
             teamModel.TeamId = Guid.NewGuid();
-            teamModel.CreatedBy = UserRepository.GetCurrentUser().UserId;
+            teamModel.CreatedBy = userRepository.GetCurrentUser().UserId;
+            teamGroupModel.TeamId = teamModel.TeamId;
+            teamGroupModel.UserId = teamModel.CreatedBy;
+            teamGroupModel.UserTeamRoleId = userTeamRoleRepository.GetTeamRoleModels().FirstOrDefault(x => x.UserTeamRoleName == "Master").UserTeamRoleId;
             dbContext.Teams.InsertOnSubmit(MapModelToDbObject(teamModel));
             dbContext.SubmitChanges();
+            teamGroupRepository.CreateTeamGroup(teamGroupModel);
         }
         //Read
         public List<TeamModel> GetTeamsForCurrentUserId(Guid currentUserID)
         {
             List<TeamGroupsModel> teamGroupList = new List<TeamGroupsModel>();
             List<TeamModel> teamModelList = new List<TeamModel>();
-            teamGroupList = TeamGroupRepository.GetAllTeamGroups().Where(x => x.UserId == currentUserID).ToList();
+            teamGroupList = teamGroupRepository.GetAllTeamGroups().Where(x => x.UserId == currentUserID).ToList();
             foreach(var teamGroup in teamGroupList)
             {
                 if(!teamModelList.Exists(x=>x.TeamId == teamGroup.TeamId))
@@ -77,11 +77,11 @@ namespace IssueTracker.Repository
         public List<TeamModel> GetTeamsCreatedBy()
         {
             List<TeamModel> teamList = new List<TeamModel>();
-            if (UserRepository.GetCurrentUser() == null)
+            if (userRepository.GetCurrentUser() == null)
             {
                 return teamList;
             }
-            foreach (Team team in dbContext.Teams.Where(x => x.User.UserId == UserRepository.GetCurrentUser().UserId))
+            foreach (Team team in dbContext.Teams.Where(x => x.User.UserId == userRepository.GetCurrentUser().UserId))
             {
                 teamList.Add(MapDbObjectToModel(team));
             }
@@ -110,12 +110,26 @@ namespace IssueTracker.Repository
                     dbContext.TeamGroups.DeleteOnSubmit(teamGroup);
                     dbContext.SubmitChanges();
                 }
+                foreach(var project in dbContext.Projects.Where(x=>x.TeamId == teamModel.TeamId))
+                {
+                    foreach(var issue in dbContext.Issues.Where(x=>x.ProjectId == project.ProjectId))
+                    {
+                        foreach(var action in dbContext.Actions.Where(x=>x.IssueId == issue.IssueId))
+                        {
+                            dbContext.Actions.DeleteOnSubmit(action);
+                            dbContext.SubmitChanges();
+                        }
+                        dbContext.Issues.DeleteOnSubmit(issue);
+                        dbContext.SubmitChanges();
+                    }
+                    dbContext.Projects.DeleteOnSubmit(project);
+                    dbContext.SubmitChanges();
+                }
                 dbContext.Teams.DeleteOnSubmit(existingTeam);
                 dbContext.SubmitChanges();
                 return;
             }
             return;
         }
-
     }
 }

@@ -37,18 +37,18 @@ namespace IssueTracker.Validation
             var startDateValue = startDate.GetValue(validationContext.ObjectInstance, null);
             var endDateValue = endDate.GetValue(validationContext.ObjectInstance, null);
 
-            if (value is DateTime && (startDateValue is DateTime) && (endDateValue is DateTime))
+            if (value is DateTime && (startDateValue is DateTime time1) && (endDateValue is DateTime time))
             {
                 if (Compare == Compare.GreaterThan)
                 {
-                    bool equals = ((DateTime)startDateValue) > ((DateTime)endDateValue);
+                    bool equals = time1 > time;
                     if (!equals)
                         return new ValidationResult(FormatErrorMessage(StartDate + " must be greater than " + EndDate));
 
                 }
                 else if (Compare == Compare.LessThan)
                 {
-                    bool equals = ((DateTime)startDateValue) < ((DateTime)endDateValue);
+                    bool equals = time1 < time;
                     if (!equals)
                         return new ValidationResult(FormatErrorMessage(StartDate + " must be less than " + EndDate));
 

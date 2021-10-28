@@ -34,17 +34,21 @@
             else
             {
             <tr>
-
+            
                 <td>
                     @Html.DisplayFor(modelItem => item.UserNameSurname)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.TeamRoleName)
                 </td>
-
+            
                 <td>
-                    @Html.ActionLink("User Details", "EditTeamMember", new { TeamId = item.TeamId, UserId = item.UserId }) |
-                    @Html.ActionLink("Delete", "DeleteUserFromTeam", new { TeamId = item.TeamId, UserId = item.UserId, TeamRoleId = item.TeamRoleId })
+                    @Html.ActionLink("User Details", "EditTeamMember", new { TeamId = item.TeamId, UserId = item.UserId })
+                    @if (ViewBag.CreatedBy == ViewBag.CurrentUser)
+                    {
+                            <content>|</content>
+                            @Html.ActionLink("Delete", "DeleteUserFromTeam", new { TeamId = item.TeamId, UserId = item.UserId, TeamRoleId = item.TeamRoleId })
+                    }
                 </td>
             </tr>
             }

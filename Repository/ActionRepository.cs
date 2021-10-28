@@ -2,15 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace IssueTracker.Repository
 {
     public class ActionRepository
     {
-        private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
-        private IssueRepository issueRepository = new IssueRepository();
-
+        private readonly Models.DBObjects.IssueTrackerModelsDataContext dbContext;
         public ActionRepository()
         {
             this.dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
@@ -19,20 +16,20 @@ namespace IssueTracker.Repository
         {
             this.dbContext = dbContext;
         }
-
         public ActionModel MapDbObjectToModel(Models.DBObjects.Action action)
         {
             if (action != null)
             {
-                ActionModel actionModel = new ActionModel();
-                actionModel.ActionId = action.ActionId;
-                actionModel.IssueId = action.IssueId;
-                actionModel.ActionName = action.ActionName;
-                actionModel.ActionDescription = action.ActionDescription;
-                actionModel.StartDate = action.StartDate;
-                actionModel.EndDate = action.EndDate;
-                actionModel.StatusId = action.StatusId;
-
+                ActionModel actionModel = new ActionModel
+                {
+                    ActionId = action.ActionId,
+                    IssueId = action.IssueId,
+                    ActionName = action.ActionName,
+                    ActionDescription = action.ActionDescription,
+                    StartDate = action.StartDate,
+                    EndDate = action.EndDate,
+                    StatusId = action.StatusId
+                };
                 return actionModel;
             }
             return null;
@@ -41,26 +38,25 @@ namespace IssueTracker.Repository
         {
             if (actionModel != null)
             {
-                Models.DBObjects.Action action = new Models.DBObjects.Action();
-                action.ActionId = actionModel.ActionId;
-                action.IssueId = actionModel.IssueId;
-                action.ActionName = actionModel.ActionName;
-                action.ActionDescription = actionModel.ActionDescription;
-                action.StartDate = actionModel.StartDate;
-                action.EndDate = actionModel.EndDate;
-                action.StatusId = actionModel.StatusId;
-
+                Models.DBObjects.Action action = new Models.DBObjects.Action
+                {
+                    ActionId = actionModel.ActionId,
+                    IssueId = actionModel.IssueId,
+                    ActionName = actionModel.ActionName,
+                    ActionDescription = actionModel.ActionDescription,
+                    StartDate = actionModel.StartDate,
+                    EndDate = actionModel.EndDate,
+                    StatusId = actionModel.StatusId
+                };
                 return action;
             }
             return null;
         }
-
         //Create
         public void CreateAction(ActionModel actionModel)
         {
-            Models.DBObjects.Action action = new Models.DBObjects.Action();
             actionModel.ActionId = Guid.NewGuid();
-            action = MapModelToDbObject(actionModel);
+            Models.DBObjects.Action action = MapModelToDbObject(actionModel);
             dbContext.Actions.InsertOnSubmit(action);
             dbContext.SubmitChanges();
         }
@@ -77,12 +73,6 @@ namespace IssueTracker.Repository
         public ActionModel GetActionById(Guid ActionId)
         {
             return MapDbObjectToModel(dbContext.Actions.FirstOrDefault(a => a.ActionId == ActionId));
-        }
-        public IssueModel GetIssueByAction(ActionModel actionModel)
-        {
-            IssueModel issueModel = new IssueModel();
-            issueModel = issueRepository.MapDbObjectToModel(dbContext.Issues.FirstOrDefault(i => i.IssueId == actionModel.IssueId));
-            return issueModel;
         }
         //Update
         public void UpdateAction(ActionModel actionModel)
@@ -101,7 +91,5 @@ namespace IssueTracker.Repository
             dbContext.Actions.DeleteOnSubmit(existingAction);
             dbContext.SubmitChanges();
         }
-
-
     }
 }

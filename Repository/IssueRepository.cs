@@ -3,15 +3,13 @@ using IssueTracker.Models.DBObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace IssueTracker.Repository
 {
     public class IssueRepository
     {
-        private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
-        private ProjectRepository projectRepository = new ProjectRepository();
-
+        private readonly Models.DBObjects.IssueTrackerModelsDataContext dbContext;
+        private readonly ProjectRepository projectRepository = new ProjectRepository();
         public IssueRepository()
         {
             this.dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
@@ -24,16 +22,17 @@ namespace IssueTracker.Repository
         {
             if (issueModel != null)
             {
-                Issue dbIssue = new Issue();
-                dbIssue.IssueId = issueModel.IssueId;
-                dbIssue.ProjectId = issueModel.ProjectId;
-                dbIssue.UserId = issueModel.UserId;
-                dbIssue.IssueName = issueModel.IssueName;
-                dbIssue.IssueDescription = issueModel.IssueDescription;
-                dbIssue.StartDate = issueModel.StartDate;
-                dbIssue.EndDate = issueModel.EndDate;
-                dbIssue.StatusId = issueModel.StatusId;
-
+                Issue dbIssue = new Issue
+                {
+                    IssueId = issueModel.IssueId,
+                    ProjectId = issueModel.ProjectId,
+                    UserId = issueModel.UserId,
+                    IssueName = issueModel.IssueName,
+                    IssueDescription = issueModel.IssueDescription,
+                    StartDate = issueModel.StartDate,
+                    EndDate = issueModel.EndDate,
+                    StatusId = issueModel.StatusId
+                };
                 return dbIssue;
             }
             return null;
@@ -42,21 +41,21 @@ namespace IssueTracker.Repository
         {
             if (dbIssue != null)
             {
-                IssueModel issueModel = new IssueModel();
-                issueModel.IssueId = dbIssue.IssueId;
-                issueModel.ProjectId = dbIssue.ProjectId;
-                issueModel.UserId = dbIssue.UserId;
-                issueModel.IssueName = dbIssue.IssueName;
-                issueModel.IssueDescription = dbIssue.IssueDescription;
-                issueModel.StartDate = dbIssue.StartDate;
-                issueModel.EndDate = dbIssue.EndDate;
-                issueModel.StatusId = dbIssue.StatusId;
-
+                IssueModel issueModel = new IssueModel
+                {
+                    IssueId = dbIssue.IssueId,
+                    ProjectId = dbIssue.ProjectId,
+                    UserId = dbIssue.UserId,
+                    IssueName = dbIssue.IssueName,
+                    IssueDescription = dbIssue.IssueDescription,
+                    StartDate = dbIssue.StartDate,
+                    EndDate = dbIssue.EndDate,
+                    StatusId = dbIssue.StatusId
+                };
                 return issueModel;
             }
             return null;
         }
-
         //Create
         public void CreateIssue(IssueModel issueModel)
         {
@@ -64,7 +63,6 @@ namespace IssueTracker.Repository
             dbContext.Issues.InsertOnSubmit(MapModelToDbObject(issueModel));
             dbContext.SubmitChanges();
         }
-
         //Read
         public List<IssueModel> GetIssuesByProjectId(Guid ProjectId)
         {
@@ -85,11 +83,9 @@ namespace IssueTracker.Repository
             ProjectModel projectModel = projectRepository.GetProjectByProjectId(GetIssueById(IssueId).ProjectId);
             return projectModel.TeamId;
         }
-
         //Update
         public void UpdateIssue(IssueModel issueModel)
         {
-
             Issue existingIssue = dbContext.Issues.FirstOrDefault(i => i.IssueId == issueModel.IssueId);
             if(existingIssue !=null)
             {
@@ -113,6 +109,4 @@ namespace IssueTracker.Repository
             }
         }
     }
-
-
 }

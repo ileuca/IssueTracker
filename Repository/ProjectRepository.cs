@@ -3,15 +3,12 @@ using IssueTracker.Models.DBObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace IssueTracker.Repository
 {
     public class ProjectRepository
     {
-        private Models.DBObjects.IssueTrackerModelsDataContext dbContext;
-        private TeamRepository TeamRepository = new TeamRepository();
-
+        private readonly Models.DBObjects.IssueTrackerModelsDataContext dbContext;
         public ProjectRepository()
         {
             this.dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
@@ -20,7 +17,6 @@ namespace IssueTracker.Repository
         {
             this.dbContext = dbContext;
         }
-
         public Project MapModelToDbObject(ProjectModel projectModel)
         {
             Project dbProject = new Project();
@@ -33,10 +29,8 @@ namespace IssueTracker.Repository
                 dbProject.StartDate = projectModel.StartDate;
                 dbProject.EndDate = projectModel.EndDate;
                 dbProject.StatusId = projectModel.StatusId;
-
                 return dbProject;
             }
-
             return null;
         }
         public ProjectModel MapDbObjectToModel(Project dbProject)
@@ -56,7 +50,6 @@ namespace IssueTracker.Repository
             }
             return null;
         }
-
         //Create
         public void CreateProject(ProjectModel projectModel)
         {
@@ -64,7 +57,6 @@ namespace IssueTracker.Repository
             dbContext.Projects.InsertOnSubmit(MapModelToDbObject(projectModel));
             dbContext.SubmitChanges();
         }
-
         //Read
         public List<ProjectModel> GetProjectsByTeamId(Guid TeamId)
         {
@@ -82,7 +74,6 @@ namespace IssueTracker.Repository
             projectModel = MapDbObjectToModel(dbProject);
             return projectModel;
         }
-
         //Update
         public void UpdateProject(ProjectModel projectModel)
         {
@@ -95,14 +86,11 @@ namespace IssueTracker.Repository
             existingProject.StatusId = projectModel.StatusId;
             dbContext.SubmitChanges();
         }
-
-
         //Delete
         public void DeleteProject(ProjectModel projectModel)
         {
             Project existingProject = dbContext.Projects.FirstOrDefault(x => x.ProjectId == projectModel.ProjectId);
             var issues = dbContext.Issues.Where(i => i.ProjectId == existingProject.ProjectId);
-
             if (existingProject !=null)
             {
                 foreach (var issue in issues)
