@@ -11,11 +11,13 @@
             @{ string value = Model.FirstOrDefault().TeamName;}
             @value
         </h2>
-        @Html.ActionLink("Add New User", "AddUser", "Team", new { @id = Model.FirstOrDefault().TeamId }, new {@class="btn btn-success"})
-    </div>
+        @if (ViewBag.CreatedBy == ViewBag.CurrentUser)
+        {
+            @Html.ActionLink("Add New User", "AddUser", "Team", new { @TeamId = Model.FirstOrDefault().TeamId }, new { @class = "btn btn-success" })
+        }
+        </div>
     <table class="table">
         <tr>
-
             <th>
                 @Html.DisplayNameFor(model => model.UserNameSurname)
             </th>

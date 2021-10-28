@@ -41,19 +41,19 @@ namespace IssueTracker.Controllers
             teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
             UpdateModel(teamViewModel);
             TeamViewRepository.UpdateTeamGroup(teamViewModel);
-            return RedirectToAction("Details", new { id=teamViewModel.TeamId});
+            return RedirectToAction("Details", new { teamViewModel.TeamId});
         }
-        public ActionResult AddUser(Guid id)
+        public ActionResult AddUser(Guid TeamId)
         {
             TeamViewModel teamViewModel = new TeamViewModel();
-            if (TeamViewRepository.GetTEamViewModelsByTeamId(id).Find(x => x.TeamId == id) != null)
+            if (TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId) != null)
             {
-                teamViewModel.TeamId = TeamViewRepository.GetTEamViewModelsByTeamId(id).Find(x => x.TeamId == id).TeamId;
+                teamViewModel.TeamId = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId).TeamId;
                 return View("AddUser", teamViewModel);
             }
             else
             {
-                teamViewModel.TeamId = id;
+                teamViewModel.TeamId = TeamId;
                 return View("AddUser", teamViewModel);
             }
         }
@@ -65,7 +65,7 @@ namespace IssueTracker.Controllers
                 TeamViewModel teamViewModel = new TeamViewModel();
                 UpdateModel(teamViewModel);
                 TeamViewRepository.CreateTeamGroup(teamViewModel);
-                return RedirectToAction("Details",new { id = teamViewModel.TeamId });
+                return RedirectToAction("Details",new { teamViewModel.TeamId });
             }
             catch
             {
@@ -186,7 +186,7 @@ namespace IssueTracker.Controllers
                 };
                 TeamGroupRepository.DeleteTeamGroup(teamViewModel);
 
-                return RedirectToAction("Details", new { id = teamViewModel.TeamId });
+                return RedirectToAction("Details", new { teamViewModel.TeamId });
             }
             catch
             {
