@@ -28,33 +28,64 @@ namespace IssueTracker.Controllers
         }
         public ActionResult EditTeamMember(Guid TeamId, Guid UserId)
         {
-            TeamViewModel teamViewModel = new TeamViewModel();
-            teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
-            ViewBag.CreatedBy = TeamRepository.GetTeamById(TeamId).CreatedBy;
-            ViewBag.CurrentUser = UserRepository.GetCurrentUser().UserId;
-            return View("EditTeamMember",teamViewModel);
+            try
+            {
+                TeamViewModel teamViewModel = new TeamViewModel();
+                teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
+                ViewBag.CreatedBy = TeamRepository.GetTeamById(TeamId).CreatedBy;
+                ViewBag.CurrentUser = UserRepository.GetCurrentUser().UserId;
+                return View("EditTeamMember", teamViewModel);
+            }
+            catch
+            {
+                return View("Index", "Home");
+            }
         }
         [HttpPost]
         public ActionResult EditTeamMember(Guid TeamId, Guid UserId, FormCollection formCollection)
         {
-            TeamViewModel teamViewModel = new TeamViewModel();
-            teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
-            UpdateModel(teamViewModel);
-            TeamViewRepository.UpdateTeamGroup(teamViewModel);
-            return RedirectToAction("Details", new { teamViewModel.TeamId});
+            try
+            {
+                TeamViewModel teamViewModel = new TeamViewModel();
+                teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
+                UpdateModel(teamViewModel);
+                TeamViewRepository.UpdateTeamGroup(teamViewModel);
+                return RedirectToAction("Details", new { teamViewModel.TeamId });
+            }
+            catch
+            {
+                return View();
+            }
         }
         public ActionResult AddUser(Guid TeamId)
         {
-            TeamViewModel teamViewModel = new TeamViewModel();
-            if (TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId) != null)
+            try
             {
-                teamViewModel.TeamId = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId).TeamId;
-                return View("AddUser", teamViewModel);
+                List<UserModel> usersToAdd = new List<UserModel>();
+                List<TeamGroupsModel> teamGroups = TeamGroupRepository.GetAllTeamGroups().FindAll(x => x.TeamId == TeamId);
+                foreach (var user in UserRepository.GetAllUsers())
+                {
+                    if (!teamGroups.Exists(x => x.UserId == user.UserId))
+                    {
+                        usersToAdd.Add(user);
+                    }
+                }
+                ViewBag.UsersToAdd = usersToAdd;
+                TeamViewModel teamViewModel = new TeamViewModel();
+                if (TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId) != null)
+                {
+                    teamViewModel.TeamId = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId).TeamId;
+                    return View("AddUser", teamViewModel);
+                }
+                else
+                {
+                    teamViewModel.TeamId = TeamId;
+                    return View("AddUser", teamViewModel);
+                }
             }
-            else
+            catch
             {
-                teamViewModel.TeamId = TeamId;
-                return View("AddUser", teamViewModel);
+                return View("Index", "Home");
             }
         }
         [HttpPost]
@@ -74,20 +105,27 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Details(Guid TeamId)
         {
-            List<TeamViewModel> teamViewModels = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId);
-            ViewBag.CreatedBy = TeamRepository.GetTeamById(TeamId).CreatedBy;
-            ViewBag.CurrentUser = UserRepository.GetCurrentUser().UserId;
-            if (TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Count == 0)
+            try
             {
-                TeamViewModel teamViewModel = new TeamViewModel
+                List<TeamViewModel> teamViewModels = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId);
+                ViewBag.CreatedBy = TeamRepository.GetTeamById(TeamId).CreatedBy;
+                ViewBag.CurrentUser = UserRepository.GetCurrentUser().UserId;
+                if (TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Count == 0)
                 {
-                    TeamId = TeamId,
-                    UserNameSurname = ""
-                };
-                teamViewModels.Add(teamViewModel);
+                    TeamViewModel teamViewModel = new TeamViewModel
+                    {
+                        TeamId = TeamId,
+                        UserNameSurname = ""
+                    };
+                    teamViewModels.Add(teamViewModel);
+                    return View("Details", teamViewModels);
+                }
                 return View("Details", teamViewModels);
             }
-            return View("Details", teamViewModels);
+            catch
+            {
+                return View("Index", "Home");
+            }
         }
         public ActionResult Create()
         {
@@ -103,15 +141,22 @@ namespace IssueTracker.Controllers
                 TeamRepository.CreateTeam(teamModel);
                 return RedirectToAction("Index");
             }
-            catch(Exception ex)
+            catch
             {
-                return View(ex);
+                return View();
             }
         }
         public ActionResult EditTeam(Guid TeamId)
         {
-            TeamModel teamModel = TeamRepository.GetTeamById(TeamId);
-            return View("Edit",teamModel);
+            try
+            {
+                TeamModel teamModel = TeamRepository.GetTeamById(TeamId);
+                return View("Edit", teamModel);
+            }
+            catch
+            {
+                return View("Index", "Home");
+            }
         }
         [HttpPost]
         public ActionResult EditTeam(Guid TeamId, FormCollection collection)
@@ -130,16 +175,23 @@ namespace IssueTracker.Controllers
         }
         public ActionResult DeleteTeam(Guid TeamId)
         {
-            if (TeamRepository.GetTeamsCreatedBy().Find(x => x.TeamId == TeamId) != null)
+            try
             {
-                if (UserRepository.GetCurrentUser().UserId == TeamRepository.GetTeamsCreatedBy().Find(x => x.TeamId == TeamId).CreatedBy)
+                if (TeamRepository.GetTeamsCreatedBy().Find(x => x.TeamId == TeamId) != null)
                 {
-                    ViewBag.TeamName = TeamRepository.GetTeamsCreatedBy().Find(x => x.TeamId == TeamId).TeamName;
+                    if (UserRepository.GetCurrentUser().UserId == TeamRepository.GetTeamsCreatedBy().Find(x => x.TeamId == TeamId).CreatedBy)
+                    {
+                        ViewBag.TeamName = TeamRepository.GetTeamsCreatedBy().Find(x => x.TeamId == TeamId).TeamName;
+                        return View();
+                    }
                     return View();
                 }
                 return View();
             }
-            return View();
+            catch
+            {
+                return View("Index", "Home");
+            }
         }
         [HttpPost]
         public ActionResult DeleteTeam(Guid TeamId, FormCollection collection)
@@ -169,9 +221,16 @@ namespace IssueTracker.Controllers
         }
         public ActionResult DeleteUserFromTeam(Guid TeamId, Guid UserId, Guid TeamRoleId)
         {
-            ViewBag.UserName = UserRepository.GetUserById(UserId).UserName;
-            ViewBag.TeamRoleName = UserTeamRoleRepository.GetTeamRoleModels().Find(x => x.UserTeamRoleId == TeamRoleId).UserTeamRoleName;
-            return View();
+            try
+            {
+                ViewBag.UserName = UserRepository.GetUserById(UserId).UserName;
+                ViewBag.TeamRoleName = UserTeamRoleRepository.GetTeamRoleModels().Find(x => x.UserTeamRoleId == TeamRoleId).UserTeamRoleName;
+                return View();
+            }
+            catch
+            {
+                return View("Index", "Home");
+            }
         }
         [HttpPost]
         public ActionResult DeleteUserFromTeam(Guid TeamId, Guid UserId, Guid TeamRoleId, FormCollection collection)

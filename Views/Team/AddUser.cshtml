@@ -22,7 +22,7 @@
         <div class="form-group">
             <p class = "control-label col-md-2">Name Surname</p>
             <div class="col-md-10">
-                @Html.DropDownListFor(Model => Model.UserId, new SelectList(Model.userList, "UserId","UserName"))
+                @Html.DropDownListFor(Model => Model.UserId, new SelectList(ViewBag.UsersToAdd, "UserId","UserName"))
                 @Html.ValidationMessageFor(model => model.UserId, "", new { @class = "text-danger" })
             </div>
         </div>

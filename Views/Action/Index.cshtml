@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<h2>@ViewBag.IssueName</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create","Action",new { IssueId = ViewBag.IssueId},null)
@@ -13,37 +13,27 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.ActionId)
+            Action
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.IssueId)
+            Description
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ActionName)
+            Start Date
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ActionDescription)
+            End Date
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.StartDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.EndDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.StatusId)
+            Status
         </th>
         <th></th>
     </tr>
 
 @foreach (var item in Model) {
+    var startDate = item.StartDate.Value.ToString("dd-MM-yyyy");
+    var endDate = item.EndDate.Value.ToString("dd-MM-yyyy");
     <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.ActionId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IssueId)
-        </td>
         <td>
             @Html.DisplayFor(modelItem => item.ActionName)
         </td>
@@ -51,13 +41,13 @@
             @Html.DisplayFor(modelItem => item.ActionDescription)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.StartDate)
+            @Html.DisplayFor(modelItem => startDate)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.EndDate)
+            @Html.DisplayFor(modelItem => endDate)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.StatusId)
+            @Html.DisplayFor(modelItem => item.StatusList.Find(x => x.StatusId == item.StatusId).StatusName)
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { ActionId = item.ActionId }) |
@@ -67,3 +57,6 @@
 }
 
 </table>
+<div>
+    @Html.ActionLink("Back to Issues", "Index", "Issue", new { ViewBag.TeamId, ViewBag.ProjectId }, null)
+</div>

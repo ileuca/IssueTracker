@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<h2>@ViewBag.ProjectName</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create","Issue",new { ProjectId = ViewBag.ProjectId, TeamId = ViewBag.TeamId},null)
@@ -13,64 +13,51 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.IssueId)
+            Issue
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ProjectId)
+            Description
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.UserId)
+            Start Date
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.IssueName)
+            End Date
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.IssueDescription)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.StartDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.EndDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.StatusId)
+            Status
         </th>
         <th></th>
     </tr>
 
 @foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.IssueId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ProjectId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UserId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IssueName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IssueDescription)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.StartDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.EndDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.StatusId)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new {IssueId=item.IssueId}) |
-            @Html.ActionLink("Actions", "Index","Action", new { IssueId = item.IssueId },null) |
-            @Html.ActionLink("Delete", "Delete", new { IssueId = item.IssueId })
-        </td>
-    </tr>
+    var startDate = item.StartDate.Value.ToString("dd-MM-yyyy");
+    var endDate = item.EndDate.Value.ToString("dd-MM-yyyy");
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.IssueName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.IssueDescription)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => startDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => endDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.StatusList.Find(x => x.StatusId == item.StatusId).StatusName)
+    </td>
+    <td>
+        @Html.ActionLink("Edit", "Edit", new { IssueId = item.IssueId }) |
+        @Html.ActionLink("Actions", "Index", "Action", new { IssueId = item.IssueId }, null) |
+        @Html.ActionLink("Delete", "Delete", new { IssueId = item.IssueId })
+    </td>
+</tr>
 }
 
 </table>
+<div>
+    @Html.ActionLink("Back to Projects", "Index", "Project", null, null)
+</div>

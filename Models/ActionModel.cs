@@ -1,5 +1,7 @@
-﻿using IssueTracker.Validation;
+﻿using IssueTracker.Repository;
+using IssueTracker.Validation;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace IssueTracker.Models
@@ -17,6 +19,12 @@ namespace IssueTracker.Models
         [DateCheck("EndDate", "StartDate", Compare.GreaterThan)]
         public DateTime? EndDate { get; set; }
         public Guid StatusId { get; set; }
+        public List<StatusModel> StatusList { get; set; }
+        public ActionModel()
+        {
+            StatusRepository statusRepository = new StatusRepository();
+            StatusList = statusRepository.GetStatuses();
+        }
 
     }
 }

@@ -11,9 +11,14 @@ namespace IssueTracker.Controllers
     {
         private readonly ActionRepository actionRepository = new ActionRepository();
         private readonly StatusRepository StatusRepository = new StatusRepository();
+        private readonly IssueRepository issueRepository = new IssueRepository();
+        private readonly ProjectRepository projectRepository = new ProjectRepository();
         public ActionResult Index(Guid IssueId)
         {
             ViewBag.IssueId = IssueId;
+            ViewBag.IssueName = issueRepository.GetIssueById(IssueId).IssueName;
+            ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
+            ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
             List<ActionModel> actionsForIssue = actionRepository.GetActionsByIssueId(IssueId);
             return View(actionsForIssue);
         }
@@ -42,6 +47,7 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Edit(Guid ActionId)
         {
+            ViewBag.IssueId = actionRepository.GetActionById(ActionId).IssueId;
             ActionModel actionToEdit = actionRepository.GetActionById(ActionId);
             return View(actionToEdit);
         }

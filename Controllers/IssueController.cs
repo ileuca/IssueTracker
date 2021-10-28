@@ -13,10 +13,12 @@ namespace IssueTracker.Controllers
         private readonly UserRepository userRepository = new UserRepository();
         private readonly TeamViewRepository teamViewRepository = new TeamViewRepository();
         private readonly StatusRepository StatusRepository = new StatusRepository();
+        private readonly ProjectRepository projectRepository = new ProjectRepository();
         public ActionResult Index(Guid TeamId, Guid ProjectId)
         {
             ViewBag.TeamId = TeamId;
-            ViewBag.Projectid = ProjectId;
+            ViewBag.ProjectId = ProjectId;
+            ViewBag.ProjectName = projectRepository.GetProjectByProjectId(ProjectId).ProjectName;
             List<IssueModel> issuesByProjectId = issueRepository.GetIssuesByProjectId(ProjectId);
             return View("Index", issuesByProjectId);
         }
@@ -24,10 +26,12 @@ namespace IssueTracker.Controllers
         {
             return View();
         }
-        public ActionResult Create(Guid TeamId)
+        public ActionResult Create(Guid TeamId, Guid ProjectId)
         {
             List<UserModel> userList = teamViewRepository.GetUsersByTeamId(TeamId);
             ViewBag.UserFromTeam = userList;
+            ViewBag.TeamId = TeamId;
+            ViewBag.ProjectId = ProjectId;
             return View();
         }
         [HttpPost]
@@ -55,6 +59,8 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Edit(Guid IssueId)
         {
+            ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
+            ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
             IssueModel issueModel = issueRepository.GetIssueById(IssueId);
             return View(issueModel);
         }
@@ -75,6 +81,8 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Delete(Guid IssueId)
         {
+            ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
+            ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
             return View();
         }
         [HttpPost]

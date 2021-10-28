@@ -21,12 +21,15 @@ namespace IssueTracker.Models
         [DateCheck("EndDate","StartDate", Compare.GreaterThan)]
         public DateTime? EndDate { get; set; }
         public Guid StatusId { get; set; }
-
         public List<TeamModel> TeamList { get; set; }
+        public List<StatusModel> StatusList { get; set; }
         public ProjectModel()
         {
+            UserRepository userRepository = new UserRepository();
             TeamRepository teamRepository = new TeamRepository();
-            TeamList = teamRepository.GetTeamsCreatedBy();
+            TeamList = teamRepository.GetTeamsForCurrentUserId(userRepository.GetCurrentUser().UserId);
+            StatusRepository statusRepository = new StatusRepository();
+            StatusList = statusRepository.GetStatuses();
         }
 
     }
