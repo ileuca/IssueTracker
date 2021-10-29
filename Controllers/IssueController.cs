@@ -14,13 +14,39 @@ namespace IssueTracker.Controllers
         private readonly TeamViewRepository teamViewRepository = new TeamViewRepository();
         private readonly StatusRepository StatusRepository = new StatusRepository();
         private readonly ProjectRepository projectRepository = new ProjectRepository();
+        private readonly UserTeamRoleRepository userTeamRoleRepository = new UserTeamRoleRepository();
         public ActionResult Index(Guid TeamId, Guid ProjectId)
         {
             ViewBag.TeamId = TeamId;
             ViewBag.ProjectId = ProjectId;
             ViewBag.ProjectName = projectRepository.GetProjectByProjectId(ProjectId).ProjectName;
-            List<IssueModel> issuesByProjectId = issueRepository.GetIssuesByProjectId(ProjectId);
-            return View("Index", issuesByProjectId);
+
+            var currentUser = userRepository.GetCurrentUser();
+            bool userIsMasterInTeam = teamViewRepository.GetAllTeamGroups().FindAll(x => x.UserId == currentUser.UserId)
+                .FindAll(x => x.UserTeamRoleId == userTeamRoleRepository.GetTeamRoleModels()
+                .Find(y => y.UserTeamRoleName == "Master").UserTeamRoleId).Exists(x => x.TeamId == TeamId);
+            ViewBag.UserIsMaster = userIsMasterInTeam;
+
+
+            List<IssueModel> issuesToBeReturned = new List<IssueModel>();
+
+            List<IssueModel> allIssuesInThisProject = issueRepository.GetIssuesByProjectId(ProjectId);
+
+            if (userIsMasterInTeam)
+            {
+                return View("Index", allIssuesInThisProject);
+            }
+            else
+            {
+                foreach(var issue in allIssuesInThisProject)
+                {
+                    if(currentUser.UserId == issue.UserId )
+                    {
+                        issuesToBeReturned.Add(issue);
+                    }
+                }
+                return View("Index", issuesToBeReturned);
+            }
         }
         public ActionResult Details(Guid ProjectId)
         {
@@ -59,6 +85,8 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Edit(Guid IssueId)
         {
+            List<UserModel> userList = teamViewRepository.GetUsersByTeamId(issueRepository.GetTeamIdByIssueId(IssueId));
+            ViewBag.UserFromTeam = userList;
             ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
             ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
             IssueModel issueModel = issueRepository.GetIssueById(IssueId);

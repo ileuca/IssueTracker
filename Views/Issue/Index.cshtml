@@ -12,6 +12,12 @@
 </p>
 <table class="table">
     <tr>
+        @if (ViewBag.UserIsMaster)
+        {
+            <th>
+                User
+            </th>
+        }
         <th>
             Issue
         </th>
@@ -34,6 +40,12 @@
     var startDate = item.StartDate.Value.ToString("dd-MM-yyyy");
     var endDate = item.EndDate.Value.ToString("dd-MM-yyyy");
 <tr>
+    @if (ViewBag.UserIsMaster)
+    {
+    <td>
+        @Html.DisplayFor(modelItem => item.UserList.Find(x => x.UserId == item.UserId).UserName)
+    </td>
+    }
     <td>
         @Html.DisplayFor(modelItem => item.IssueName)
     </td>

@@ -24,10 +24,13 @@ namespace IssueTracker.Models
         public DateTime? EndDate { get; set; }
         public Guid StatusId { get; set; }
         public List<StatusModel> StatusList { get; set; }
+        public List<UserModel> UserList { get; set; }
         public IssueModel()
         {
             StatusRepository statusRepository = new StatusRepository();
             StatusList = statusRepository.GetStatuses();
+            UserRepository userRepository = new UserRepository();
+            UserList = userRepository.GetAllUsers();
         }
     }
 }
