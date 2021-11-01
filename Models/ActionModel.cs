@@ -13,6 +13,7 @@ namespace IssueTracker.Models
         [Required]
         public string ActionName { get; set; }
         [Required]
+        [DataType(DataType.MultilineText)]
         public string ActionDescription { get; set; }
         [DateCheck("StartDate", "EndDate", Compare.LessThan)]
         public DateTime? StartDate { get; set; }

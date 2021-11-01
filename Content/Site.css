@@ -91,3 +91,7 @@ textarea {
 .show {
     display: block;
 }
+
+.description{
+    height: 500px !IMPORTANT;
+}

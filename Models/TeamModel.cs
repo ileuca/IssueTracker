@@ -9,6 +9,7 @@ namespace IssueTracker.Models
         [Required]
         public string TeamName { get; set; }
         [Required]
+        [DataType(DataType.MultilineText)]
         public string TeamDescription { get; set; }
         public Guid CreatedBy { get; set; }
 

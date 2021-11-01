@@ -15,6 +15,7 @@ namespace IssueTracker.Models
         [Required]
         public string IssueName { get; set; }
         [Required]
+        [DataType(DataType.MultilineText)]
         public string IssueDescription { get; set; }
 
         [DateCheck("StartDate", "EndDate", Compare.LessThan)]

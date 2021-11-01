@@ -13,6 +13,7 @@ namespace IssueTracker.Models
         [Required]
         public string ProjectName { get; set; }
         [Required]
+        [DataType(DataType.MultilineText)]
         public string ProjectDescription { get; set; }
 
         [DateCheck("StartDate", "EndDate", Compare.LessThan)]

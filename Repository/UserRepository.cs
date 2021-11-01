@@ -53,5 +53,11 @@ namespace IssueTracker.Repository
             }
             return usersList;
         }
+        public void SaveUserChanges(UserModel userModel)
+        {
+            User user = dbContext.Users.FirstOrDefault(x => x.UserId == userModel.UserId);
+            user.UserDescription = userModel.UserDescription;
+            dbContext.SubmitChanges();
+        }
     }
 }
