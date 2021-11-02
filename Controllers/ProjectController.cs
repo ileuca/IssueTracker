@@ -53,7 +53,7 @@ namespace IssueTracker.Controllers
                     {
                         projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
                     }
-                    else if(projectModel.StartDate < DateTime.Now && projectModel.EndDate > DateTime.Now)
+                    else if(projectModel.StartDate <= DateTime.Now && projectModel.EndDate > DateTime.Now)
                     {
                         projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
                     }

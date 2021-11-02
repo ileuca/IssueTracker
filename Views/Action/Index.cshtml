@@ -50,6 +50,11 @@
             @Html.DisplayFor(modelItem => item.StatusList.Find(x => x.StatusId == item.StatusId).StatusName)
         </td>
         <td>
+            @if(item.StatusId != item.StatusList.Find(x=>x.StatusName == "Finished").StatusId)
+                {
+                    @Html.ActionLink("Set As Done","SetAsDone", new { ActionId = item.ActionId }) <content>|</content>
+                }
+
             @Html.ActionLink("Edit", "Edit", new { ActionId = item.ActionId }) |
             @Html.ActionLink("Delete", "Delete", new { ActionId = item.ActionId })
         </td>

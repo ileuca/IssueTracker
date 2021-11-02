@@ -362,6 +362,7 @@
     <Content Include="Views\Action\Delete.cshtml" />
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\Issue\_error.cshtml" />
+    <Content Include="Views\Action\_error.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

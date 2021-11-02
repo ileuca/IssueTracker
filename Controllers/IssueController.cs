@@ -77,16 +77,24 @@ namespace IssueTracker.Controllers
                 {
                     UpdateModel(issueModel);
                     issueModel.ProjectId = ProjectId;
-                    if (issueModel.StartDate > DateTime.Now && issueModel.EndDate > DateTime.Now)
+                    ProjectModel projectModel = projectRepository.GetProjectByProjectId(ProjectId);
+                    if (projectModel.StartDate <= issueModel.StartDate && projectModel.EndDate >= issueModel.EndDate)
                     {
-                        issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                        if (issueModel.StartDate > DateTime.Now && issueModel.EndDate > DateTime.Now)
+                        {
+                            issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                        }
+                        else if (issueModel.StartDate <= DateTime.Now && issueModel.EndDate > DateTime.Now)
+                        {
+                            issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                        }
+                        issueRepository.CreateIssue(issueModel);
+                        return RedirectToAction("Index", new { TeamId, ProjectId });
                     }
-                    else if (issueModel.StartDate < DateTime.Now && issueModel.EndDate > DateTime.Now)
+                    else
                     {
-                        issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                        return View("_error");
                     }
-                    issueRepository.CreateIssue(issueModel);
-                    return RedirectToAction("Index", new { TeamId, ProjectId });
                 }
                 return View();
             }
@@ -111,8 +119,25 @@ namespace IssueTracker.Controllers
             try
             {
                 UpdateModel(issueModel);
-                issueRepository.UpdateIssue(issueModel);
-                return RedirectToAction("Index",new { TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId), issueModel.ProjectId});
+                ProjectModel projectModel = projectRepository.GetProjectByProjectId(issueModel.ProjectId);
+                if (projectModel.StartDate <= issueModel.StartDate && projectModel.EndDate >= issueModel.EndDate)
+                {
+                    if (issueModel.StartDate > DateTime.Now && issueModel.EndDate > DateTime.Now)
+                    {
+                        issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                    }
+                    else if (issueModel.StartDate <= DateTime.Now && issueModel.EndDate > DateTime.Now)
+                    {
+                        issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    }
+                    issueRepository.UpdateIssue(issueModel);
+                    return RedirectToAction("Index", new { TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId), issueModel.ProjectId });
+                }
+                else
+                {
+                    return View("_error");
+                }
+
             }
             catch
             {

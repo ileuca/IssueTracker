@@ -82,6 +82,7 @@ namespace IssueTracker.Repository
             existingAction.ActionDescription = actionModel.ActionDescription;
             existingAction.StartDate = actionModel.StartDate;
             existingAction.EndDate = actionModel.EndDate;
+            existingAction.StatusId = actionModel.StatusId;
             dbContext.SubmitChanges();
         }
         //Delete

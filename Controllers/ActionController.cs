@@ -22,7 +22,7 @@ namespace IssueTracker.Controllers
             List<ActionModel> actionsForIssue = actionRepository.GetActionsByIssueId(IssueId);
             foreach(var action in actionsForIssue)
             {
-                if (action.EndDate < DateTime.Now)
+                if (action.EndDate < DateTime.Now && action.StatusId != StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Finished").StatusId)
                 {
                     action.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
                     actionRepository.UpdateAction(action);
@@ -43,16 +43,24 @@ namespace IssueTracker.Controllers
             {
                 UpdateModel(actionModel);
                 actionModel.IssueId = IssueId;
-                if (actionModel.StartDate > DateTime.Now && actionModel.EndDate > DateTime.Now)
+                IssueModel issueModel = issueRepository.GetIssueById(IssueId);
+                if (issueModel.StartDate <= actionModel.StartDate && issueModel.EndDate >= actionModel.EndDate)
                 {
-                    actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                    if (actionModel.StartDate > DateTime.Now && actionModel.EndDate > DateTime.Now)
+                    {
+                        actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                    }
+                    else if (actionModel.StartDate <= DateTime.Now && actionModel.EndDate > DateTime.Now)
+                    {
+                        actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    }
+                    actionRepository.CreateAction(actionModel);
+                    return RedirectToAction("Index", new { IssueId });
                 }
-                else if (actionModel.StartDate < DateTime.Now && actionModel.EndDate > DateTime.Now)
+                else
                 {
-                    actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    return View("_error");
                 }
-                actionRepository.CreateAction(actionModel);
-                return RedirectToAction("Index",new { IssueId });
             }
             catch
             {
@@ -68,16 +76,33 @@ namespace IssueTracker.Controllers
         [HttpPost]
         public ActionResult Edit(FormCollection collection)
         {
-            ActionModel editedAction = new ActionModel();
+            ActionModel actionModel = new ActionModel();
             try
             {
-                UpdateModel(editedAction);
-                actionRepository.UpdateAction(editedAction);
-                return RedirectToAction("Index",new { editedAction.IssueId});
+                UpdateModel(actionModel);
+                IssueModel issueModel = issueRepository.GetIssueById(actionModel.IssueId);
+                if (issueModel.StartDate <= actionModel.StartDate && issueModel.EndDate >= actionModel.EndDate)
+                {
+                    if (actionModel.StartDate > DateTime.Now && actionModel.EndDate > DateTime.Now)
+                    {
+                        actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                    }
+                    else if (actionModel.StartDate <= DateTime.Now && actionModel.EndDate > DateTime.Now)
+                    {
+                        actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    }
+                    actionRepository.UpdateAction(actionModel);
+                    return RedirectToAction("Index", new { actionModel.IssueId });
+                }
+                else
+                {
+                    return View("_error");
+                }
+
             }
             catch
             {
-                return View(editedAction);
+                return View(actionModel);
             }
         }
         public ActionResult Delete(Guid ActionId)
@@ -94,6 +119,20 @@ namespace IssueTracker.Controllers
                 Guid IssueId = actionToDelete.IssueId;
                 actionRepository.DeleteAction(actionToDelete);
                 return RedirectToAction("Index",new { IssueId });
+            }
+            catch
+            {
+                return View();
+            }
+        }
+        public ActionResult SetAsDone(Guid ActionId)
+        {
+            ActionModel actionModel = actionRepository.GetActionById(ActionId);
+            try
+            {
+                actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Finished").StatusId;
+                actionRepository.UpdateAction(actionModel);
+                return RedirectToAction("Index", new { actionModel.IssueId });
             }
             catch
             {
