@@ -10,7 +10,5 @@ namespace IssueTracker.Models
         public string UserEmail { get; set; }
         [DataType(DataType.MultilineText)]
         public string UserDescription { get; set; }
-
-
     }
 }

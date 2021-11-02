@@ -40,7 +40,12 @@ namespace IssueTracker.Controllers
             {
                 foreach(var issue in allIssuesInThisProject)
                 {
-                    if(currentUser.UserId == issue.UserId )
+                    if (issue.EndDate < DateTime.Now)
+                    {
+                        issue.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
+                        issueRepository.UpdateIssue(issue);
+                    }
+                    if (currentUser.UserId == issue.UserId )
                     {
                         issuesToBeReturned.Add(issue);
                     }
@@ -72,7 +77,15 @@ namespace IssueTracker.Controllers
                 {
                     UpdateModel(issueModel);
                     issueModel.ProjectId = ProjectId;
-                    issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    ProjectModel projectModel = projectRepository.GetProjectByProjectId(ProjectId);
+                    if (issueModel.StartDate > DateTime.Now && issueModel.EndDate > DateTime.Now)
+                    {
+                        issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                    }
+                    else if (issueModel.StartDate < DateTime.Now && issueModel.EndDate > DateTime.Now)
+                    {
+                        issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    }
                     issueRepository.CreateIssue(issueModel);
                     return RedirectToAction("Index", new { TeamId, ProjectId });
                 }

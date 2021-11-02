@@ -24,6 +24,11 @@ namespace IssueTracker.Controllers
                 List<ProjectModel> projectsByTeam = projectRepository.GetProjectsByTeamId(team.TeamId);
                 foreach (var project in projectsByTeam)
                 {
+                    if(project.EndDate < DateTime.Now)
+                    {
+                        project.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
+                        projectRepository.UpdateProject(project);
+                    }
                     projectsByUser.Add(project);
                 }
             }
@@ -44,8 +49,14 @@ namespace IssueTracker.Controllers
                 {
 
                     UpdateModel(projectModel);
-                    //de modificat sa verifice datele pentru status
-                    projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    if (projectModel.StartDate > DateTime.Now && projectModel.EndDate > DateTime.Now)
+                    {
+                        projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                    }
+                    else if(projectModel.StartDate < DateTime.Now && projectModel.EndDate > DateTime.Now)
+                    {
+                        projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                    }
                     projectRepository.CreateProject(projectModel);
 
                     return RedirectToAction("Index");

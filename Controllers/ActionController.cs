@@ -20,6 +20,14 @@ namespace IssueTracker.Controllers
             ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
             ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
             List<ActionModel> actionsForIssue = actionRepository.GetActionsByIssueId(IssueId);
+            foreach(var action in actionsForIssue)
+            {
+                if (action.EndDate < DateTime.Now)
+                {
+                    action.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
+                    actionRepository.UpdateAction(action);
+                }
+            }
             return View(actionsForIssue);
         }
         public ActionResult Create(Guid IssueId)
@@ -35,8 +43,14 @@ namespace IssueTracker.Controllers
             {
                 UpdateModel(actionModel);
                 actionModel.IssueId = IssueId;
-                //de modificat sa verifice datele pentru status
-                actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                if (actionModel.StartDate > DateTime.Now && actionModel.EndDate > DateTime.Now)
+                {
+                    actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                }
+                else if (actionModel.StartDate < DateTime.Now && actionModel.EndDate > DateTime.Now)
+                {
+                    actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                }
                 actionRepository.CreateAction(actionModel);
                 return RedirectToAction("Index",new { IssueId });
             }
