@@ -77,7 +77,6 @@ namespace IssueTracker.Controllers
                 {
                     UpdateModel(issueModel);
                     issueModel.ProjectId = ProjectId;
-                    ProjectModel projectModel = projectRepository.GetProjectByProjectId(ProjectId);
                     if (issueModel.StartDate > DateTime.Now && issueModel.EndDate > DateTime.Now)
                     {
                         issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
