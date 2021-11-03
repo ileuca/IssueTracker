@@ -15,6 +15,7 @@ namespace IssueTracker.Controllers
         private readonly StatusRepository StatusRepository = new StatusRepository();
         private readonly ProjectRepository projectRepository = new ProjectRepository();
         private readonly UserTeamRoleRepository userTeamRoleRepository = new UserTeamRoleRepository();
+        private readonly ActionRepository actionRepository = new ActionRepository();
         public ActionResult Index(Guid TeamId, Guid ProjectId)
         {
             ViewBag.TeamId = TeamId;
@@ -159,6 +160,26 @@ namespace IssueTracker.Controllers
                 Guid TeamId = issueRepository.GetTeamIdByIssueId(issueModel.IssueId);
                 issueRepository.DeleteIssue(issueModel);
                 return RedirectToAction("Index", new { TeamId, issueModel.ProjectId });
+            }
+            catch
+            {
+                return View();
+            }
+        }
+        public ActionResult SetAsDone(Guid IssueId)
+        {
+            IssueModel issueModel = issueRepository.GetIssueById(IssueId);
+            try
+            {
+                issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Finished").StatusId;
+                issueRepository.UpdateIssue(issueModel);
+                List<ActionModel> actionsForThisIssue = actionRepository.GetActionsByIssueId(IssueId);
+                foreach(var action in actionsForThisIssue)
+                {
+                    action.StatusId = issueModel.StatusId;
+                    actionRepository.UpdateAction(action);
+                }
+                return RedirectToAction("Index", new { projectRepository.GetProjectByProjectId(issueModel.ProjectId).TeamId, issueModel.ProjectId });
             }
             catch
             {

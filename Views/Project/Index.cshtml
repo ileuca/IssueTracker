@@ -59,6 +59,10 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         @Html.DisplayFor(modelItem => item.StatusList.Find(x => x.StatusId == item.StatusId).StatusName)
     </td>
     <td>
+        @if (item.StatusId != item.StatusList.Find(x => x.StatusName == "Finished").StatusId)
+        {
+            @Html.ActionLink("Set As Done", "SetAsDone",new { ProjectId = item.ProjectId}) <content>|</content>
+        }
         @Html.ActionLink("Edit", "Edit", new { ProjectId = item.ProjectId }) |
         @Html.ActionLink("Issues", "Index", "Issue", new { TeamId = item.TeamId, ProjectId = item.ProjectId }, null) |
         @Html.ActionLink("Delete", "Delete", new { ProjectId = item.ProjectId })

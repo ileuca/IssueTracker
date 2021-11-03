@@ -11,6 +11,8 @@ namespace IssueTracker.Controllers
     public class ProjectController : Controller
     {
         private readonly ProjectRepository projectRepository = new ProjectRepository();
+        private readonly IssueRepository issueRepository = new IssueRepository();
+        private readonly ActionRepository actionRepository = new ActionRepository();
         private readonly UserRepository UserRepository = new UserRepository();
         private readonly TeamRepository TeamRepository = new TeamRepository();
         private readonly StatusRepository StatusRepository = new StatusRepository();
@@ -19,12 +21,12 @@ namespace IssueTracker.Controllers
             User currentUser = UserRepository.GetCurrentUser();
             List<TeamModel> teamList = TeamRepository.GetTeamsForCurrentUserId(currentUser.UserId);
             List<ProjectModel> projectsByUser = new List<ProjectModel>();
-            foreach(var team in teamList)
+            foreach (var team in teamList)
             {
                 List<ProjectModel> projectsByTeam = projectRepository.GetProjectsByTeamId(team.TeamId);
                 foreach (var project in projectsByTeam)
                 {
-                    if(project.EndDate < DateTime.Now)
+                    if (project.EndDate < DateTime.Now)
                     {
                         project.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
                         projectRepository.UpdateProject(project);
@@ -32,7 +34,7 @@ namespace IssueTracker.Controllers
                     projectsByUser.Add(project);
                 }
             }
-            return View("Index",projectsByUser);
+            return View("Index", projectsByUser);
         }
         public ActionResult Create()
         {
@@ -53,7 +55,7 @@ namespace IssueTracker.Controllers
                     {
                         projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
                     }
-                    else if(projectModel.StartDate <= DateTime.Now && projectModel.EndDate > DateTime.Now)
+                    else if (projectModel.StartDate <= DateTime.Now && projectModel.EndDate > DateTime.Now)
                     {
                         projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
                     }
@@ -109,5 +111,33 @@ namespace IssueTracker.Controllers
                 return View();
             }
         }
+        public ActionResult SetAsDone(Guid ProjectId)
+        {
+            try
+            {
+                ProjectModel projectModel = projectRepository.GetProjectByProjectId(ProjectId);
+                List<IssueModel> issuesInThisProject = issueRepository.GetIssuesByProjectId(ProjectId);
+                StatusModel status = projectModel.StatusList.Find(x => x.StatusName == "Finished");
+                foreach (var issue in issuesInThisProject)
+                {
+                    List<ActionModel> actionsInThisIssue = actionRepository.GetActionsByIssueId(issue.IssueId);
+                    foreach (var action in actionsInThisIssue)
+                    {
+                        action.StatusId = status.StatusId;
+                        actionRepository.UpdateAction(action);
+                    }
+                    issue.StatusId = status.StatusId;
+                    issueRepository.UpdateIssue(issue);
+                }
+                projectModel.StatusId = status.StatusId;
+                projectRepository.UpdateProject(projectModel);
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View();
+            }
+        }
     }
 }
+

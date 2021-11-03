@@ -93,6 +93,7 @@ namespace IssueTracker.Repository
                 existingIssue.IssueDescription = issueModel.IssueDescription;
                 existingIssue.StartDate = issueModel.StartDate;
                 existingIssue.EndDate = issueModel.EndDate;
+                existingIssue.StatusId = issueModel.StatusId;
                 dbContext.SubmitChanges();
             }
         }
