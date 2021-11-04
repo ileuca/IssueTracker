@@ -16,7 +16,7 @@ namespace IssueTracker.Controllers
         private readonly ProjectRepository projectRepository = new ProjectRepository();
         private readonly UserTeamRoleRepository userTeamRoleRepository = new UserTeamRoleRepository();
         private readonly ActionRepository actionRepository = new ActionRepository();
-        public ActionResult Index(Guid TeamId, Guid ProjectId)
+        public ActionResult Index(Guid TeamId, Guid ProjectId,string searchString)
         {
             ViewBag.TeamId = TeamId;
             ViewBag.ProjectId = ProjectId;
@@ -35,6 +35,11 @@ namespace IssueTracker.Controllers
 
             if (userIsMasterInTeam)
             {
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    allIssuesInThisProject = allIssuesInThisProject.Where(i => i.IssueName.Contains(searchString)
+                                                    || i.IssueDescription.Contains(searchString)).ToList();
+                }
                 return View("Index", allIssuesInThisProject);
             }
             else
@@ -50,6 +55,11 @@ namespace IssueTracker.Controllers
                     {
                         issuesToBeReturned.Add(issue);
                     }
+                }
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    issuesToBeReturned = issuesToBeReturned.Where(i => i.IssueName.Contains(searchString)
+                                                    || i.IssueDescription.Contains(searchString)).ToList();
                 }
                 return View("Index", issuesToBeReturned);
             }

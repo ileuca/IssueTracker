@@ -13,7 +13,7 @@ namespace IssueTracker.Controllers
         private readonly StatusRepository StatusRepository = new StatusRepository();
         private readonly IssueRepository issueRepository = new IssueRepository();
         private readonly ProjectRepository projectRepository = new ProjectRepository();
-        public ActionResult Index(Guid IssueId)
+        public ActionResult Index(Guid IssueId,string searchString)
         {
             ViewBag.IssueId = IssueId;
             ViewBag.IssueName = issueRepository.GetIssueById(IssueId).IssueName;
@@ -27,6 +27,11 @@ namespace IssueTracker.Controllers
                     action.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
                     actionRepository.UpdateAction(action);
                 }
+            }
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                actionsForIssue = actionsForIssue.Where(a => a.ActionName.Contains(searchString)
+                                                || a.ActionDescription.Contains(searchString)).ToList();
             }
             return View(actionsForIssue);
         }

@@ -16,7 +16,7 @@ namespace IssueTracker.Controllers
         private readonly UserRepository UserRepository = new UserRepository();
         private readonly TeamRepository TeamRepository = new TeamRepository();
         private readonly StatusRepository StatusRepository = new StatusRepository();
-        public ActionResult Index()
+        public ActionResult Index(string searchString)
         {
             User currentUser = UserRepository.GetCurrentUser();
             List<TeamModel> teamList = TeamRepository.GetTeamsForCurrentUserId(currentUser.UserId);
@@ -33,6 +33,11 @@ namespace IssueTracker.Controllers
                     }
                     projectsByUser.Add(project);
                 }
+            }
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                projectsByUser = projectsByUser.Where(p => p.ProjectName.Contains(searchString)
+                                                || p.ProjectDescription.Contains(searchString)).ToList();
             }
             return View("Index", projectsByUser);
         }

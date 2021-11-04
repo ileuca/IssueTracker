@@ -8,8 +8,15 @@
 <h2>@ViewBag.ProjectName</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create","Issue",new { ProjectId = ViewBag.ProjectId, TeamId = ViewBag.TeamId},null)
+    @Html.ActionLink("Create New", "Create", "Issue", new { ProjectId = ViewBag.ProjectId, TeamId = ViewBag.TeamId }, null)
 </p>
+@using (Html.BeginForm())
+{
+    <p>
+        Find Project: @Html.TextBox("SearchString", null, new { type = "search", value = "Search" })
+        <input type="submit" value="Search" />
+    </p>
+}
 <table class="table">
     <tr>
         @if (ViewBag.UserIsMaster)
@@ -36,42 +43,43 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    var startDate = item.StartDate.Value.ToString("dd-MM-yyyy");
-    var endDate = item.EndDate.Value.ToString("dd-MM-yyyy");
-<tr>
-    @if (ViewBag.UserIsMaster)
+    @foreach (var item in Model)
     {
-    <td>
-        @Html.DisplayFor(modelItem => item.UserList.Find(x => x.UserId == item.UserId).UserName)
-    </td>
+        var startDate = item.StartDate.Value.ToString("dd-MM-yyyy");
+        var endDate = item.EndDate.Value.ToString("dd-MM-yyyy");
+        <tr>
+            @if (ViewBag.UserIsMaster)
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserList.Find(x => x.UserId == item.UserId).UserName)
+                </td>
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.IssueName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IssueDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => startDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => endDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StatusList.Find(x => x.StatusId == item.StatusId).StatusName)
+            </td>
+            <td>
+                @if (item.StatusId != item.StatusList.Find(x => x.StatusName == "Finished").StatusId)
+                {
+                    @Html.ActionLink("Set As Done", "SetAsDone", new { IssueId = item.IssueId }) <content>|</content>
+                }
+                @Html.ActionLink("Edit", "Edit", new { IssueId = item.IssueId }) |
+                @Html.ActionLink("Actions", "Index", "Action", new { IssueId = item.IssueId }, null) |
+                @Html.ActionLink("Delete", "Delete", new { IssueId = item.IssueId })
+            </td>
+        </tr>
     }
-    <td>
-        @Html.DisplayFor(modelItem => item.IssueName)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.IssueDescription)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => startDate)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => endDate)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.StatusList.Find(x => x.StatusId == item.StatusId).StatusName)
-    </td>
-    <td>
-        @if (item.StatusId != item.StatusList.Find(x => x.StatusName == "Finished").StatusId)
-        {
-            @Html.ActionLink("Set As Done", "SetAsDone", new { IssueId = item.IssueId }) <content>|</content>
-        }
-        @Html.ActionLink("Edit", "Edit", new { IssueId = item.IssueId }) |
-        @Html.ActionLink("Actions", "Index", "Action", new { IssueId = item.IssueId }, null) |
-        @Html.ActionLink("Delete", "Delete", new { IssueId = item.IssueId })
-    </td>
-</tr>
-}
 
 </table>
 <div>

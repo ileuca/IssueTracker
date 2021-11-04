@@ -89,6 +89,7 @@ namespace IssueTracker.Repository
             Issue existingIssue = dbContext.Issues.FirstOrDefault(i => i.IssueId == issueModel.IssueId);
             if(existingIssue !=null)
             {
+                existingIssue.UserId = issueModel.UserId;
                 existingIssue.IssueName = issueModel.IssueName;
                 existingIssue.IssueDescription = issueModel.IssueDescription;
                 existingIssue.StartDate = issueModel.StartDate;

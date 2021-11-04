@@ -10,6 +10,13 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+@using (Html.BeginForm())
+            {
+                <p>
+                    Find Project: @Html.TextBox("SearchString",null,new { type="search", value="Search"})
+                    <input type="submit" value="Search"/>
+                </p>
+            }
 <table class="table">
     <tr>
         <th>
