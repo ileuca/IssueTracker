@@ -60,7 +60,22 @@ namespace IssueTracker.Repository
             teamGroupRepository.CreateTeamGroup(teamGroupModel);
         }
         //Read
-        public List<TeamModel> GetTeamsForCurrentUserId(Guid currentUserID)
+        public List<TeamModel> GetTeamsForCurrentUserId(Guid currentUserID, string roleName)
+        {
+            List<TeamGroupsModel> teamGroupList = new List<TeamGroupsModel>();
+            List<TeamModel> teamModelList = new List<TeamModel>();
+            teamGroupList = teamGroupRepository.GetAllTeamGroups().Where(x => x.UserId == currentUserID).ToList();
+            foreach (var teamGroup in teamGroupList)
+            {
+                if (!teamModelList.Exists(x => x.TeamId == teamGroup.TeamId) 
+                    && teamGroup.UserTeamRoleId == userTeamRoleRepository.GetTeamRoleModels().Find(x=>x.UserTeamRoleName == roleName).UserTeamRoleId)
+                {
+                    teamModelList.Add(GetTeamById(teamGroup.TeamId));
+                }
+            }
+            return teamModelList;
+        }
+            public List<TeamModel> GetTeamsForCurrentUserId(Guid currentUserID)
         {
             List<TeamGroupsModel> teamGroupList = new List<TeamGroupsModel>();
             List<TeamModel> teamModelList = new List<TeamModel>();

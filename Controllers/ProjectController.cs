@@ -13,56 +13,73 @@ namespace IssueTracker.Controllers
         private readonly ProjectRepository projectRepository = new ProjectRepository();
         private readonly IssueRepository issueRepository = new IssueRepository();
         private readonly ActionRepository actionRepository = new ActionRepository();
-        private readonly UserRepository UserRepository = new UserRepository();
-        private readonly TeamRepository TeamRepository = new TeamRepository();
-        private readonly StatusRepository StatusRepository = new StatusRepository();
+        private readonly UserRepository userRepository = new UserRepository();
+        private readonly TeamRepository teamRepository = new TeamRepository();
+        private readonly StatusRepository statusRepository = new StatusRepository();
         public ActionResult Index(string searchString)
         {
-            User currentUser = UserRepository.GetCurrentUser();
-            List<TeamModel> teamList = TeamRepository.GetTeamsForCurrentUserId(currentUser.UserId);
-            List<ProjectModel> projectsByUser = new List<ProjectModel>();
-            foreach (var team in teamList)
+            try
             {
-                List<ProjectModel> projectsByTeam = projectRepository.GetProjectsByTeamId(team.TeamId);
-                foreach (var project in projectsByTeam)
+                User currentUser = userRepository.GetCurrentUser();
+                List<TeamModel> teamList = teamRepository.GetTeamsForCurrentUserId(currentUser.UserId);
+                List<ProjectModel> projectsByUser = new List<ProjectModel>();
+                foreach (var team in teamList)
                 {
-                    if (project.EndDate < DateTime.Now)
+                    List<ProjectModel> projectsByTeam = projectRepository.GetProjectsByTeamId(team.TeamId);
+                    foreach (var project in projectsByTeam)
                     {
-                        project.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
-                        projectRepository.UpdateProject(project);
+                        if (project.EndDate < DateTime.Now)
+                        {
+                            project.StatusId = statusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
+                            projectRepository.UpdateProject(project);
+                        }
+                        projectsByUser.Add(project);
                     }
-                    projectsByUser.Add(project);
                 }
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    projectsByUser = projectsByUser.Where(p => p.ProjectName.Contains(searchString)
+                                                    || p.ProjectDescription.Contains(searchString)).ToList();
+                }
+                return View("Index", projectsByUser);
             }
-            if(!string.IsNullOrEmpty(searchString))
+            catch
             {
-                projectsByUser = projectsByUser.Where(p => p.ProjectName.Contains(searchString)
-                                                || p.ProjectDescription.Contains(searchString)).ToList();
+                return RedirectToAction("Index", "Home");
             }
-            return View("Index", projectsByUser);
+
         }
         public ActionResult Create()
         {
-            ProjectModel projectModel = new ProjectModel();
-            return View(projectModel);
+            try
+            {
+                ProjectModel projectModel = new ProjectModel();
+                projectModel.TeamList = teamRepository.GetTeamsForCurrentUserId(userRepository.GetCurrentUser().UserId, "Master");
+                return View(projectModel);
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
         }
         [HttpPost]
         public ActionResult Create(FormCollection collection)
         {
             ProjectModel projectModel = new ProjectModel();
+
             try
             {
                 if (ModelState.IsValid)
-                {
-
+                { 
                     UpdateModel(projectModel);
                     if (projectModel.StartDate > DateTime.Now && projectModel.EndDate > DateTime.Now)
                     {
-                        projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                        projectModel.StatusId = statusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
                     }
                     else if (projectModel.StartDate <= DateTime.Now && projectModel.EndDate > DateTime.Now)
                     {
-                        projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                        projectModel.StatusId = statusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
                     }
                     projectRepository.CreateProject(projectModel);
 
@@ -77,8 +94,15 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Edit(Guid ProjectId)
         {
-            ProjectModel projectModel = projectRepository.GetProjectByProjectId(ProjectId);
-            return View(projectModel);
+            try
+            {
+                ProjectModel projectModel = projectRepository.GetProjectByProjectId(ProjectId);
+                return View(projectModel);
+            }
+            catch 
+            { 
+                return RedirectToAction("Index", "Home"); 
+            }
         }
         [HttpPost]
         public ActionResult Edit(Guid ProjectId, FormCollection collection)
@@ -87,8 +111,14 @@ namespace IssueTracker.Controllers
             try
             {
                 UpdateModel(projectModel);
-                //de modificat sa verifice datele pentru status
-                projectModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                if (projectModel.StartDate > DateTime.Now && projectModel.EndDate > DateTime.Now)
+                {
+                    projectModel.StatusId = statusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
+                }
+                else if (projectModel.StartDate <= DateTime.Now && projectModel.EndDate > DateTime.Now)
+                {
+                    projectModel.StatusId = statusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
+                }
                 projectRepository.UpdateProject(projectModel);
 
                 return RedirectToAction("Index");
@@ -100,7 +130,15 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Delete(Guid ProjectId)
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
         }
         [HttpPost]
         public ActionResult Delete(Guid ProjectId, FormCollection collection)
@@ -140,7 +178,7 @@ namespace IssueTracker.Controllers
             }
             catch
             {
-                return View();
+                return RedirectToAction("Index", "Home");
             }
         }
     }

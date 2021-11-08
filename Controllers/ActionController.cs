@@ -15,30 +15,44 @@ namespace IssueTracker.Controllers
         private readonly ProjectRepository projectRepository = new ProjectRepository();
         public ActionResult Index(Guid IssueId,string searchString)
         {
-            ViewBag.IssueId = IssueId;
-            ViewBag.IssueName = issueRepository.GetIssueById(IssueId).IssueName;
-            ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
-            ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
-            List<ActionModel> actionsForIssue = actionRepository.GetActionsByIssueId(IssueId);
-            foreach(var action in actionsForIssue)
+            try
             {
-                if (action.EndDate < DateTime.Now && action.StatusId != StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Finished").StatusId)
+                ViewBag.IssueId = IssueId;
+                ViewBag.IssueName = issueRepository.GetIssueById(IssueId).IssueName;
+                ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
+                ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
+                List<ActionModel> actionsForIssue = actionRepository.GetActionsByIssueId(IssueId);
+                foreach (var action in actionsForIssue)
                 {
-                    action.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
-                    actionRepository.UpdateAction(action);
+                    if (action.EndDate < DateTime.Now && action.StatusId != StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Finished").StatusId)
+                    {
+                        action.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
+                        actionRepository.UpdateAction(action);
+                    }
                 }
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    actionsForIssue = actionsForIssue.Where(a => a.ActionName.Contains(searchString)
+                                                    || a.ActionDescription.Contains(searchString)).ToList();
+                }
+                return View(actionsForIssue);
             }
-            if (!string.IsNullOrEmpty(searchString))
+            catch
             {
-                actionsForIssue = actionsForIssue.Where(a => a.ActionName.Contains(searchString)
-                                                || a.ActionDescription.Contains(searchString)).ToList();
+                return RedirectToAction("Index", "Home");
             }
-            return View(actionsForIssue);
         }
         public ActionResult Create(Guid IssueId)
         {
-            ViewBag.IssueId = IssueId;
-            return View();
+            try
+            {
+                ViewBag.IssueId = IssueId;
+                return View();
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
         [HttpPost]
         public ActionResult Create(Guid IssueId, FormCollection collection)
@@ -73,10 +87,16 @@ namespace IssueTracker.Controllers
             }
         }
         public ActionResult Edit(Guid ActionId)
-        {
-            ViewBag.IssueId = actionRepository.GetActionById(ActionId).IssueId;
-            ActionModel actionToEdit = actionRepository.GetActionById(ActionId);
-            return View(actionToEdit);
+        {try
+            {
+                ViewBag.IssueId = actionRepository.GetActionById(ActionId).IssueId;
+                ActionModel actionToEdit = actionRepository.GetActionById(ActionId);
+                return View(actionToEdit);
+            }
+            catch 
+            { 
+                return RedirectToAction("Index", "Home"); 
+            }
         }
         [HttpPost]
         public ActionResult Edit(FormCollection collection)
@@ -112,8 +132,15 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Delete(Guid ActionId)
         {
-            ActionModel actiontoDelete = actionRepository.GetActionById(ActionId);
-            return View(actiontoDelete);
+            try
+            {
+                ActionModel actiontoDelete = actionRepository.GetActionById(ActionId);
+                return View(actiontoDelete);
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
         [HttpPost]
         public ActionResult Delete(Guid ActionId,FormCollection collection)

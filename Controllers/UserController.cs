@@ -13,9 +13,17 @@ namespace IssueTracker.Controllers
         private readonly UserRepository userRepository = new UserRepository();
         public ActionResult Edit()
         {
-            UserModel userModel = userRepository.GetUserById(userRepository.GetCurrentUser().UserId);
+            try
+            {
+                UserModel userModel = userRepository.GetUserById(userRepository.GetCurrentUser().UserId);
 
-            return View(userModel);
+                return View(userModel);
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
         }
 
         // POST: User/Edit/5
@@ -31,7 +39,7 @@ namespace IssueTracker.Controllers
             }
             catch
             {
-                return View();
+                return RedirectToAction("Index", "Home");
             }
         }
     }

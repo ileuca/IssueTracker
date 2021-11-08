@@ -18,63 +18,98 @@ namespace IssueTracker.Controllers
         private readonly ActionRepository actionRepository = new ActionRepository();
         public ActionResult Index(Guid TeamId, Guid ProjectId,string searchString)
         {
-            ViewBag.TeamId = TeamId;
-            ViewBag.ProjectId = ProjectId;
-            ViewBag.ProjectName = projectRepository.GetProjectByProjectId(ProjectId).ProjectName;
-
-            var currentUser = userRepository.GetCurrentUser();
-            bool userIsMasterInTeam = teamViewRepository.GetAllTeamGroups().FindAll(x => x.UserId == currentUser.UserId)
-                .FindAll(x => x.UserTeamRoleId == userTeamRoleRepository.GetTeamRoleModels()
-                .Find(y => y.UserTeamRoleName == "Master").UserTeamRoleId).Exists(x => x.TeamId == TeamId);
-            ViewBag.UserIsMaster = userIsMasterInTeam;
-
-
-            List<IssueModel> issuesToBeReturned = new List<IssueModel>();
-
-            List<IssueModel> allIssuesInThisProject = issueRepository.GetIssuesByProjectId(ProjectId);
-
-            if (userIsMasterInTeam)
+            try
             {
-                if (!string.IsNullOrEmpty(searchString))
+                ViewBag.TeamId = TeamId;
+                ViewBag.ProjectId = ProjectId;
+                ViewBag.ProjectName = projectRepository.GetProjectByProjectId(ProjectId).ProjectName;
+
+                var currentUser = userRepository.GetCurrentUser();
+                bool userIsMasterInTeam = teamViewRepository.GetAllTeamGroups().FindAll(x => x.UserId == currentUser.UserId)
+                    .FindAll(x => x.UserTeamRoleId == userTeamRoleRepository.GetTeamRoleModels()
+                    .Find(y => y.UserTeamRoleName == "Master").UserTeamRoleId).Exists(x => x.TeamId == TeamId);
+                ViewBag.UserIsMaster = userIsMasterInTeam;
+
+
+                List<IssueModel> issuesToBeReturned = new List<IssueModel>();
+
+                List<IssueModel> allIssuesInThisProject = issueRepository.GetIssuesByProjectId(ProjectId);
+
+                if (userIsMasterInTeam)
                 {
-                    allIssuesInThisProject = allIssuesInThisProject.Where(i => i.IssueName.Contains(searchString)
-                                                    || i.IssueDescription.Contains(searchString)).ToList();
+                    if (!string.IsNullOrEmpty(searchString))
+                    {
+                        allIssuesInThisProject = allIssuesInThisProject.Where(i => i.IssueName.Contains(searchString)
+                                                        || i.IssueDescription.Contains(searchString)).ToList();
+                    }
+                    return View("Index", allIssuesInThisProject);
                 }
-                return View("Index", allIssuesInThisProject);
+                else
+                {
+                    foreach (var issue in allIssuesInThisProject)
+                    {
+                        if (issue.EndDate < DateTime.Now)
+                        {
+                            issue.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
+                            issueRepository.UpdateIssue(issue);
+                        }
+                        if (currentUser.UserId == issue.UserId)
+                        {
+                            issuesToBeReturned.Add(issue);
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(searchString))
+                    {
+                        issuesToBeReturned = issuesToBeReturned.Where(i => i.IssueName.Contains(searchString)
+                                                        || i.IssueDescription.Contains(searchString)).ToList();
+                    }
+                    return View("Index", issuesToBeReturned);
+                }
+
             }
-            else
+            catch
             {
-                foreach(var issue in allIssuesInThisProject)
-                {
-                    if (issue.EndDate < DateTime.Now)
-                    {
-                        issue.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
-                        issueRepository.UpdateIssue(issue);
-                    }
-                    if (currentUser.UserId == issue.UserId )
-                    {
-                        issuesToBeReturned.Add(issue);
-                    }
-                }
-                if (!string.IsNullOrEmpty(searchString))
-                {
-                    issuesToBeReturned = issuesToBeReturned.Where(i => i.IssueName.Contains(searchString)
-                                                    || i.IssueDescription.Contains(searchString)).ToList();
-                }
-                return View("Index", issuesToBeReturned);
+                return RedirectToAction("Index", "Home");
             }
         }
         public ActionResult Details(Guid ProjectId)
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
         public ActionResult Create(Guid TeamId, Guid ProjectId)
         {
-            List<UserModel> userList = teamViewRepository.GetUsersByTeamId(TeamId);
-            ViewBag.UserFromTeam = userList;
-            ViewBag.TeamId = TeamId;
-            ViewBag.ProjectId = ProjectId;
-            return View();
+            try
+            {
+                List<UserModel> userList = new List<UserModel>();
+                var teamViewModels = teamViewRepository.GetTeamViewModelsByTeamId(TeamId);
+                var teamViewModelForCurrentUser = teamViewModels.Find(x => x.UserId == userRepository.GetCurrentUser().UserId);
+                var masterId = userTeamRoleRepository.GetTeamRoleModels().Find(x => x.UserTeamRoleName == "Master").UserTeamRoleId;
+
+                if (teamViewModelForCurrentUser.TeamRoleId == masterId)
+                {
+                    userList = teamViewRepository.GetUsersByTeamId(TeamId);
+                }
+                else
+                {
+                    userList.Add(userRepository.GetUserById(userRepository.GetCurrentUser().UserId));
+                }
+
+
+                ViewBag.UserFromTeam = userList;
+                ViewBag.ProjectId = ProjectId;
+                return View();
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
         [HttpPost]
         public ActionResult Create(Guid ProjectId, Guid TeamId, FormCollection collection)
@@ -116,12 +151,23 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Edit(Guid IssueId)
         {
-            List<UserModel> userList = teamViewRepository.GetUsersByTeamId(issueRepository.GetTeamIdByIssueId(IssueId));
-            ViewBag.UserFromTeam = userList;
-            ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
-            ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
-            IssueModel issueModel = issueRepository.GetIssueById(IssueId);
-            return View(issueModel);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    List<UserModel> userList = teamViewRepository.GetUsersByTeamId(issueRepository.GetTeamIdByIssueId(IssueId));
+                    ViewBag.UserFromTeam = userList;
+                    ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
+                    ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
+                    IssueModel issueModel = issueRepository.GetIssueById(IssueId);
+                    return View(issueModel);
+                }
+                catch
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            return RedirectToAction("Index", "Home");
         }
         [HttpPost]
         public ActionResult Edit(FormCollection collection)
@@ -157,9 +203,16 @@ namespace IssueTracker.Controllers
         }
         public ActionResult Delete(Guid IssueId)
         {
-            ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
-            ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
-            return View();
+            try
+            {
+                ViewBag.TeamId = projectRepository.GetProjectByProjectId(issueRepository.GetIssueById(IssueId).ProjectId).TeamId;
+                ViewBag.ProjectId = issueRepository.GetIssueById(IssueId).ProjectId;
+                return View();
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
         [HttpPost]
         public ActionResult Delete(Guid IssueId, FormCollection collection)

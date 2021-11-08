@@ -31,7 +31,7 @@ namespace IssueTracker.Controllers
             try
             {
                 TeamViewModel teamViewModel = new TeamViewModel();
-                teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
+                teamViewModel = TeamViewRepository.GetTeamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
                 ViewBag.CreatedBy = TeamRepository.GetTeamById(TeamId).CreatedBy;
                 ViewBag.CurrentUser = UserRepository.GetCurrentUser().UserId;
                 return View("EditTeamMember", teamViewModel);
@@ -47,7 +47,7 @@ namespace IssueTracker.Controllers
             try
             {
                 TeamViewModel teamViewModel = new TeamViewModel();
-                teamViewModel = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
+                teamViewModel = TeamViewRepository.GetTeamViewModelsByTeamId(TeamId).Find(x => x.UserId == UserId);
                 UpdateModel(teamViewModel);
                 TeamViewRepository.UpdateTeamGroup(teamViewModel);
                 return RedirectToAction("Details", new { teamViewModel.TeamId });
@@ -72,9 +72,9 @@ namespace IssueTracker.Controllers
                 }
                 ViewBag.UsersToAdd = usersToAdd;
                 TeamViewModel teamViewModel = new TeamViewModel();
-                if (TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId) != null)
+                if (TeamViewRepository.GetTeamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId) != null)
                 {
-                    teamViewModel.TeamId = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId).TeamId;
+                    teamViewModel.TeamId = TeamViewRepository.GetTeamViewModelsByTeamId(TeamId).Find(x => x.TeamId == TeamId).TeamId;
                     return View("AddUser", teamViewModel);
                 }
                 else
@@ -107,10 +107,10 @@ namespace IssueTracker.Controllers
         {
             try
             {
-                List<TeamViewModel> teamViewModels = TeamViewRepository.GetTEamViewModelsByTeamId(TeamId);
+                List<TeamViewModel> teamViewModels = TeamViewRepository.GetTeamViewModelsByTeamId(TeamId);
                 ViewBag.CreatedBy = TeamRepository.GetTeamById(TeamId).CreatedBy;
                 ViewBag.CurrentUser = UserRepository.GetCurrentUser().UserId;
-                if (TeamViewRepository.GetTEamViewModelsByTeamId(TeamId).Count == 0)
+                if (TeamViewRepository.GetTeamViewModelsByTeamId(TeamId).Count == 0)
                 {
                     TeamViewModel teamViewModel = new TeamViewModel
                     {

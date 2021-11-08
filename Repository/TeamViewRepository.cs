@@ -81,7 +81,7 @@ namespace IssueTracker.Repository
             }
             return teamViewModels;
         }
-        public List<TeamViewModel> GetTEamViewModelsByTeamId(Guid id)
+        public List<TeamViewModel> GetTeamViewModelsByTeamId(Guid id)
         {
             List<TeamViewModel> teamViewModels = new List<TeamViewModel>();
             foreach(TeamViewModel teamViewModel in GetAllTeamViewModels())
