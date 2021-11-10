@@ -65,11 +65,11 @@ namespace IssueTracker.Controllers
                 IssueModel issueModel = issueRepository.GetIssueById(IssueId);
                 if (issueModel.StartDate <= actionModel.StartDate && issueModel.EndDate >= actionModel.EndDate)
                 {
-                    if (actionModel.StartDate > DateTime.Now && actionModel.EndDate > DateTime.Now)
+                    if (actionModel.StartDate.Value.Date > DateTime.Now.Date && actionModel.EndDate.Value > DateTime.Now.Date)
                     {
                         actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
                     }
-                    else if (actionModel.StartDate <= DateTime.Now && actionModel.EndDate > DateTime.Now)
+                    else if (actionModel.StartDate.Value.Date <= DateTime.Now.Date && actionModel.EndDate.Value.Date > DateTime.Now.Date)
                     {
                         actionModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
                     }

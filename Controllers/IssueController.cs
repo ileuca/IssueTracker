@@ -48,10 +48,13 @@ namespace IssueTracker.Controllers
                 {
                     foreach (var issue in allIssuesInThisProject)
                     {
-                        if (issue.EndDate < DateTime.Now)
+                        if (issue.StatusId != StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Finished").StatusId)
                         {
-                            issue.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
-                            issueRepository.UpdateIssue(issue);
+                            if (issue.EndDate.Value.Date < DateTime.Now.Date)
+                            {
+                                issue.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Delayed").StatusId;
+                                issueRepository.UpdateIssue(issue);
+                            }
                         }
                         if (currentUser.UserId == issue.UserId)
                         {
@@ -103,6 +106,7 @@ namespace IssueTracker.Controllers
 
 
                 ViewBag.UserFromTeam = userList;
+                ViewBag.TeamId = TeamId;
                 ViewBag.ProjectId = ProjectId;
                 return View();
             }
@@ -179,11 +183,11 @@ namespace IssueTracker.Controllers
                 ProjectModel projectModel = projectRepository.GetProjectByProjectId(issueModel.ProjectId);
                 if (projectModel.StartDate <= issueModel.StartDate && projectModel.EndDate >= issueModel.EndDate)
                 {
-                    if (issueModel.StartDate > DateTime.Now && issueModel.EndDate > DateTime.Now)
+                    if (issueModel.StartDate.Value.Date > DateTime.Now.Date && issueModel.EndDate.Value.Date > DateTime.Now.Date)
                     {
                         issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "Not Started").StatusId;
                     }
-                    else if (issueModel.StartDate <= DateTime.Now && issueModel.EndDate > DateTime.Now)
+                    else if (issueModel.StartDate.Value.Date <= DateTime.Now.Date && issueModel.EndDate.Value.Date > DateTime.Now.Date)
                     {
                         issueModel.StatusId = StatusRepository.GetStatuses().FirstOrDefault(x => x.StatusName == "In Progress").StatusId;
                     }
