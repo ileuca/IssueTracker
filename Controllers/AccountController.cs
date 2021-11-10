@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using IssueTracker.Models;
+using IssueTracker.Repository;
 
 namespace IssueTracker.Controllers
 {
@@ -15,6 +16,7 @@ namespace IssueTracker.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private readonly UserRepository userRepository = new UserRepository();
 
         public AccountController()
         {
@@ -150,13 +152,10 @@ namespace IssueTracker.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserId = Guid.NewGuid(), UserName = model.Email, Email = model.Email, UserNameSurname = model.UserNameSurname };
-                Models.DBObjects.IssueTrackerModelsDataContext dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
-                dbContext.Users.InsertOnSubmit(new Models.DBObjects.User { UserId = user.UserId, UserEmail = user.Email, UserName = user.UserNameSurname });
-                dbContext.SubmitChanges();
-
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    userRepository.CreateUser(user);
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
 
                     

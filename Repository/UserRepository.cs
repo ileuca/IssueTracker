@@ -31,6 +31,13 @@ namespace IssueTracker.Repository
             }
             return null;
         }
+        //Create
+        public void CreateUser(ApplicationUser user)
+        {
+            Models.DBObjects.IssueTrackerModelsDataContext dbContext = new Models.DBObjects.IssueTrackerModelsDataContext();
+            dbContext.Users.InsertOnSubmit(new Models.DBObjects.User { UserId = user.UserId, UserEmail = user.Email, UserName = user.UserNameSurname });
+            dbContext.SubmitChanges();
+        }
         //Read
         public User GetCurrentUser()
         {
@@ -53,6 +60,7 @@ namespace IssueTracker.Repository
             }
             return usersList;
         }
+        //Update
         public void SaveUserChanges(UserModel userModel)
         {
             User user = dbContext.Users.FirstOrDefault(x => x.UserId == userModel.UserId);
